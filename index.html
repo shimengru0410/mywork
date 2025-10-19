@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>红军骁将王尔琢 - 红色云游V7</title>
+    <!-- 外部资源 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 主要Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 备用Font Awesome CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" onerror="console.warn('备用Font Awesome CDN加载失败');">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&amp;display=swap" rel="stylesheet">
+    
+    <!-- 图标加载检测和备用方案 -->
+    <script>
+        // 检测Font Awesome是否加载成功
+        function checkFontAwesome() {
+            const testIcon = document.createElement('i');
+            testIcon.className = 'fa fa-check';
+            testIcon.style.position = 'absolute';
+            testIcon.style.visibility = 'hidden';
+            document.body.appendChild(testIcon);
+            
+            // 检查图标是否正确渲染
+            const isLoaded = window.getComputedStyle(testIcon).getPropertyValue('font-family').includes('FontAwesome');
+            document.body.removeChild(testIcon);
+            
+            if (!isLoaded) {
+                console.warn('Font Awesome未正确加载，应用备用样式');
+                applyFallbackIconStyles();
+            }
+        }
+        
+        // 应用备用图标样式
+        function applyFallbackIconStyles() {
+            const style = document.createElement('style');
+            style.textContent = `
+                /* 确保所有交互按钮在移动端可见 */
+                button i.fa, a i.fa {
+                    display: inline-flex !important;
+                    width: 1em !important;
+                    height: 1em !important;
+                    line-height: 1 !important;
+                    text-align: center !important;
+                    font-size: inherit !important;
+                    color: inherit !important;
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                    
+                    /* 为关键交互按钮添加备用样式 */
+                    &::before {
+                        content: '●' !important;
+                        font-size: 0.8em !important;
+                        opacity: 0.8 !important;
+                    }
+                }
+                
+                /* 修复移动端特定交互按钮 */
+                #mobile-menu-btn i.fa {
+                    color: white !important;
+                    font-size: 1.5rem !important;
+                }
+                
+                /* 修复返回顶部按钮 */
+                #back-to-top i.fa {
+                    color: white !important;
+                    font-size: 1.2rem !important;
+                }
+                
+                /* 确保所有交互元素有足够大的点击区域 */
+                .mobile-touch-target {
+                    min-height: 48px !important;
+                    min-width: 48px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 页面加载完成后检查
+        window.addEventListener('load', function() {
+            setTimeout(checkFontAwesome, 1000);
+        });
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#C71F37', // 革命红
+                        secondary: '#8C8C8C', // 军装灰
+                        tertiary: '#D4B483', // 土地黄
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        sans: ['SimHei', '黑体', 'sans-serif'],
+                        title: ['"Ma Shan Zheng"', 'cursive', 'SimHei', '黑体'],
+                        serif: ['SimSun', '宋体', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+            .text-shadow-lg {
+                text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            }
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+            .animate-fade-in {
+                animation: fadeIn 1.5s ease-in-out;
+            }
+            .animate-slide-up {
+                animation: slideUp 1s ease-out;
+            }
+            .animate-slide-in-right {
+                animation: slideInRight 1s ease-out;
+            }
+            .animate-slide-in-left {
+                animation: slideInLeft 1s ease-in-out;
+            }
+            .animate-pulse-slow {
+                animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scene-transition {
+                transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+            }
+            .map-marker {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                cursor: pointer;
+            }
+            .map-marker:hover {
+                transform: scale(1.2);
+                box-shadow: 0 0 15px rgba(199, 31, 55, 0.7);
+            }
+            /* 进度点样式 */
+            .progress-dot {
+                transition: all 0.3s ease;
+                position: relative;
+                cursor: pointer;
+            }
+            .progress-dot::after {
+                content: attr(data-label);
+                position: absolute;
+                right: 10px;
+                white-space: nowrap;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                background-color: rgba(30, 41, 59, 0.8);
+                color: white;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 12px;
+                pointer-events: none;
+            }
+            .progress-dot:hover::after {
+                opacity: 1;
+            }
+            /* 虚拟参观图片切换样式 */
+            .virtual-tour-image-container {
+                position: relative;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+            }
+            .virtual-tour-image {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+            }
+            .virtual-tour-image.active {
+                opacity: 1;
+                z-index: 1;
+            }
+            /* 时间线动画样式 */
+            .timeline-item {
+                opacity: 0;
+                transform: translateY(20px);
+                transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            }
+            .timeline-item.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .timeline-dot {
+                transition: all 0.5s ease;
+                transform: scale(0.8);
+            }
+            .timeline-item.visible .timeline-dot {
+                transform: scale(1);
+                box-shadow: 0 0 0 4px rgba(199, 31, 55, 0.2);
+            }
+            .timeline-item.highlighted .timeline-dot {
+                transform: scale(1.2);
+                box-shadow: 0 0 0 6px rgba(199, 31, 55, 0.3);
+            }
+            .timeline-line {
+                height: 0;
+                transition: height 0.8s ease-out;
+            }
+            .timeline-line.filled {
+                height: 100%;
+            }
+            /* 书信展示样式 */
+            .letter-container {
+                position: relative;
+                transition: all 0.5s ease;
+            }
+            .letter-container:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+            .letter-content {
+                font-family: 'SimSun', '宋体', serif;
+                line-height: 2;
+                text-indent: 2em;
+            }
+            /* 弹窗样式 */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+            }
+            .modal-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+            .modal-content {
+                background-color: white;
+                border-radius: 8px;
+                width: 90%;
+                max-width: 800px;
+                max-height: 90vh;
+                overflow-y: auto;
+                transform: translateY(20px);
+                transition: transform 0.3s ease;
+            }
+            .modal-overlay.active .modal-content {
+                transform: translateY(0);
+            }
+            .modal-header {
+                position: relative;
+                padding: 1.5rem;
+                border-bottom: 1px solid #e5e7eb;
+                background-color: #C71F37;
+                color: white;
+                border-radius: 8px 8px 0 0;
+            }
+            .modal-close {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            }
+            .modal-close:hover {
+                transform: scale(1.1);
+            }
+            .modal-body {
+                padding: 1.5rem;
+            }
+            .modal-footer {
+                padding: 1rem 1.5rem;
+                border-top: 1px solid #e5e7eb;
+                text-align: right;
+            }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c71f37;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0182d;
+        }
+
+        /* 全局边距优化 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 内容区块间距优化 */
+        section {
+            transition: all 0.3s ease;
+        }
+
+        /* 卡片组件优化 */
+        .bg-white.rounded-xl.shadow-md {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .bg-white.rounded-xl.shadow-md:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 文字内容间距优化 */
+        p {
+            line-height: 1.7;
+        }
+
+        /* 按钮样式优化 */
+        button {
+            transition: all 0.3s ease;
+        }
+
+        /* 容器最大宽度限制，使PC端显示更加紧凑 */
+        .container {
+            max-width: 1200px !important;
+        }
+
+        /* 响应式边距调整 */
+        @media (max-width: 768px) {
+            section {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                max-width: 100% !important;
+            }
+            /* 移动端触摸友好调整 */
+            button, a {
+                min-height: 44px;
+                min-width: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* 移动端图标优化 */
+            i.fa {
+                display: inline-flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                color: inherit !important;
+                font-size: inherit !important;
+                width: auto !important;
+                height: auto !important;
+            }
+            
+            /* 确保所有交互按钮图标在移动端可见 */
+            button i.fa,
+            a i.fa,
+            .mobile-touch-target i.fa {
+                position: relative !important;
+                z-index: 10 !important;
+                pointer-events: none !important;
+            }
+            
+            /* 解决移动设备上字体图标可能的渲染问题 */
+            @-webkit-keyframes fa-spin {
+                0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+                100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+            }
+            
+            /* 为所有交互按钮添加备用样式 */
+            .fa-mobile-visible {
+                display: inline-block !important;
+                min-width: 20px !important;
+                min-height: 20px !important;
+                text-align: center !important;
+            }
+            /* 调整字体大小使移动端更易读 */
+            h2 {
+                font-size: 1.8rem !important;
+            }
+            h3 {
+                font-size: 1.5rem !important;
+            }
+            /* 确保虚拟参观图片在移动端正常显示 */
+            .virtual-tour-image-container {
+                height: 300px !important;
+            }
+            /* 视频卡片在移动端优化 */
+            [id$="-video-card"] {
+                width: 95% !important;
+                max-width: none !important;
+                padding: 0.5rem !important;
+            }
+            /* 移除移动端不必要的动画以提升性能 */
+            .animate-float, .animate-pulse-slow {
+                animation: none !important;
+            }
+            /* 视频加载优化 */
+            .video-thumbnail {
+                cursor: pointer;
+                transition: transform 0.3s ease;
+            }
+            .video-thumbnail:hover {
+                transform: scale(1.02);
+            }
+            .video-placeholder {
+                background-color: #000;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 200px;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1199px) {
+            /* 平板端优化 */
+            section {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            /* 大屏幕上增加左右边距，防止内容过宽 */
+            body {
+                padding-left: clamp(2rem, 10vw, 6rem);
+                padding-right: clamp(2rem, 10vw, 6rem);
+            }
+        }
+        
+        /* 全局性能优化 */
+        img {
+            image-rendering: -webkit-optimize-contrast;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+        
+        /* 减少动画触发重排 */
+        .timeline-dot {
+            transform: translateZ(0);
+            will-change: transform, box-shadow;
+        }
+        
+        /* 提升移动端点击反馈 */
+        @media (hover: none) {
+            a, button {
+                -webkit-tap-highlight-color: rgba(199, 31, 55, 0.3);
+            }
+        }
+    </style>
+
+</head>
+<body class="bg-light font-sans text-dark antialiased overflow-x-hidden" style="background-image: url('https://raw.githubusercontent.com/shimengru0410/mywork/main/photo2.png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: scroll; background-clip: border-box; background-origin: padding-box;">
+    <!-- 顶部导航 -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="main-header">
+        <nav class="bg-primary/95 text-white shadow-md">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-star text-tertiary text-xl"></i>
+                    <h1 class="text-xl md:text-2xl font-title">红军骁将王尔琢</h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
+                    <a href="#about" class="hover:text-tertiary transition-colors">英雄生平</a>
+                    <a href="#military-career" class="hover:text-tertiary transition-colors">军事生涯</a>
+                    <a href="#legacy" class="hover:text-tertiary transition-colors">精神传承</a>
+                    <a href="#commemoration" class="hover:text-tertiary transition-colors">缅怀纪念</a>
+                </div>
+                <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none mobile-touch-target">
+                    <i class="fa fa-bars text-xl fa-mobile-visible"></i>
+                </button>
+            </div>
+        </nav>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden bg-dark/95 text-white md:hidden shadow-lg">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+                <a href="#about" class="py-2 hover:text-tertiary transition-colors">英雄生平</a>
+                <a href="#military-career" class="py-2 hover:text-tertiary transition-colors">军事生涯</a>
+                <a href="#legacy" class="py-2 hover:text-tertiary transition-colors">精神传承</a>
+                <a href="#commemoration" class="py-2 hover:text-tertiary transition-colors">缅怀纪念</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 页面进度 -->
+    <div class="fixed left-0 top-0 h-full w-1 bg-gray-200 z-40">
+        <div id="progress-bar" class="h-0 bg-primary transition-all duration-300"></div>
+    </div>
+
+    <!-- 章节导航点 -->
+    <div class="fixed right-2 top-1/2 transform -translate-y-1/2 z-40 hidden lg:flex flex-col space-y-4 md:hidden">
+        <a href="#about" class="progress-dot w-3 h-3 rounded-full bg-primary/50 hover:bg-primary" data-label="英雄生平"></a>
+        <a href="#military-career" class="progress-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-primary" data-label="军事生涯"></a>
+        <a href="#legacy" class="progress-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-primary" data-label="精神传承"></a>
+        <a href="#commemoration" class="progress-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-primary" data-label="缅怀纪念"></a>
+    </div>
+
+    <!-- 主内容区 -->
+    <main class="pt-20">
+        <!-- 英雄形象横幅 -->
+        <section class="relative h-[80vh] min-h-[550px] flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <img src="https://picsum.photos/id/1000/1920/1080" alt="革命历史背景" class="w-full h-full object-cover" loading="eager">
+                <div class="absolute inset-0 bg-dark/65"></div>
+            </div>
+            <div class="container mx-auto px-6 z-10 text-center">
+                <h1 class="text-[clamp(2.5rem,6vw,5rem)] font-title text-white text-shadow-lg mb-8 animate-fade-in">
+                    红军骁将王尔琢
+                </h1>
+                <p class="text-[clamp(1rem,2vw,1.5rem)] text-white text-shadow max-w-3xl mx-auto mb-12 animate-slide-up">
+                    为革命事业英勇献身的无产阶级革命家、军事家
+                </p>
+                <a href="#about" class="inline-block bg-primary hover:bg-primary/90 text-white font-bold py-4 px-10 rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 animate-pulse-slow">
+                    开始了解 <i class="fa fa-arrow-down ml-2"></i>
+                </a>
+            </div>
+            <div class="absolute bottom-10 left-0 right-0 text-center z-10">
+                <a href="#about" class="text-white animate-bounce inline-block">
+                    <i class="fa fa-angle-double-down text-3xl"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- 第一部分：英雄生平 -->
+        <section id="about" class="py-24 bg-white/90">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-20">
+                    <div class="inline-block bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-medium mb-4">
+                        英雄生平
+                    </div>
+                    <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold mb-6">革命军中的<span class="text-primary">青年将领</span></h2>
+                    <p class="text-gray-600">了解王尔琢从青年学子到红军将领的成长历程</p>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-16 items-center">
+                    <div class="md:w-1/3 animate-slide-in-left">
+                        <div class="relative">
+                            <img src="https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/fc6f042b176f4ad48049abc7dc3a4072~tplv-a9rns2rl98-image.image?rcl=20251016215302D9DA644EC637FD122A72&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1761227584&amp;x-signature=hKU6selSdPm8vQexwk9%2FoN138DQ%3D" alt="王尔琢肖像" class="w-full h-auto rounded-lg shadow-xl" loading="lazy">
+                            <div class="absolute -bottom-4 -right-4 bg-primary text-white p-4 rounded-lg shadow-lg">
+                                <p class="font-bold">1903-1928</p>
+                                <p class="text-sm">为革命事业牺牲，年仅25岁</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-2/3 animate-slide-in-right">                        
+                        <div class="space-y-6 text-gray-700 leading-relaxed">
+                            <p>
+                                王尔琢（1903年1月23日—1928年8月25日），湖南石门县人，是中国工农红军优秀指挥员、无产阶级革命家、军事家。他早年就读于黄埔军校第一期，深受周恩来等共产党人的影响，加入中国共产党。
+                            </p>
+                            <p>
+                                作为南昌起义的重要参与者，王尔琢在起义后随部队南下，参与领导湘南起义，并与朱德、陈毅一起率领部队上井冈山，与毛泽东领导的秋收起义部队胜利会师，共同组建中国工农红军第四军（后改称红四军），任参谋长兼第28团团长，成为红军早期重要的军事指挥员。
+                            </p>
+                            <p>
+                                1928年8月25日，在江西崇义思顺墟追击叛徒时，王尔琢不幸中弹牺牲，年仅25岁。毛泽东亲自为其撰写挽联，高度评价他为"为革命牺牲，重于泰山"。
+                            </p>
+                        </div>
+                        
+                        <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-gray-50 p-6 rounded-lg shadow-sm border-l-4 border-primary transform transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+                                <div class="text-primary text-3xl mb-4">
+                                    <i class="fa fa-graduation-cap"></i>
+                                </div>
+                                <h3 class="font-bold text-lg mb-2">黄埔精英</h3>
+                                <p class="text-gray-600 text-sm">黄埔军校第一期毕业生，深受周恩来赏识，军事理论扎实，作战指挥能力出众。</p>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-lg shadow-sm border-l-4 border-primary transform transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+                                <div class="text-primary text-3xl mb-4">
+                                    <i class="fa fa-university"></i>
+                                </div>
+                                <h3 class="font-bold text-lg mb-2">红军骁将</h3>
+                                <p class="text-gray-600 text-sm">参与创建红四军，任参谋长兼第28团团长，是红军早期重要的军事指挥员。</p>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-lg shadow-sm border-l-4 border-primary transform transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+                                <div class="text-primary text-3xl mb-4">
+                                    <i class="fa fa-heart"></i>
+                                </div>
+                                <h3 class="font-bold text-lg mb-2">革命烈士</h3>
+                                <p class="text-gray-600 text-sm">为追击叛徒壮烈牺牲，毛泽东为其题词"一哭尔琢，二哭尔琢，尔琢今已矣！"。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 移除了双箭头翻页符 -->
+                
+                <!-- 革命历程时间线 - 与前面内容无缝连接 -->
+                <div id="revolutionary-journey" class="mt-16">
+                    <h3 class="text-2xl font-bold mb-8 text-center">王尔琢的<span class="text-primary">革命足迹</span></h3>
+
+                    <div class="relative">
+                        <!-- 时间线中轴线 - 动态填充 -->
+                        <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-1 bg-gray-200 transform md:translate-x-[-0.5px]">
+                            <div class="timeline-line absolute left-0 top-0 w-full bg-primary/70"></div>
+                        </div>
+                        
+                        <!-- 时间点1 -->
+                        <div class="relative mb-20 md:mb-28 timeline-item">
+                            <div class="flex flex-col md:flex-row items-center">
+                                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 mt-6 md:mt-0">
+                                    <h3 class="font-bold text-xl mb-2">出生与早年求学</h3>
+                                    <p class="text-gray-600">1903年1月23日，王尔琢出生于湖南省石门县一个知识分子家庭。自幼聪慧好学，先后就读于石门县立高等小学、湖南省立甲种工业学校。</p>
+                                </div>
+                                <div class="absolute left-0 md:left-1/2 w-6 h-6 rounded-full bg-primary shadow-lg transform md:translate-x-[-50%] z-10 order-1 md:order-2 timeline-dot"></div>
+                                <div class="md:w-1/2 md:pl-12 order-3"></div>
+                                <div class="md:hidden order-1 text-primary font-bold">1903年</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 时间点2 -->
+                        <div class="relative mb-20 md:mb-28 timeline-item">
+                            <div class="flex flex-col md:flex-row items-center">
+                                <div class="md:w-1/2 md:pr-12 order-1"></div>
+                                <div class="absolute left-0 md:left-1/2 w-6 h-6 rounded-full bg-primary shadow-lg transform md:translate-x-[-50%] z-10 order-2 timeline-dot"></div>
+                                <div class="md:w-1/2 md:pl-12 order-3 mt-6 md:mt-0">
+                                    <div class="md:hidden text-primary font-bold mb-2">1924年</div>
+                                    <h3 class="font-bold text-xl mb-2">考入黄埔军校</h3>
+                                    <p class="text-gray-600">1924年，王尔琢考入黄埔军校第一期，同年加入中国共产党。在校期间，他刻苦学习军事知识，积极参与革命活动，深受周恩来等共产党人的影响。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 时间点3 -->
+                        <div class="relative mb-20 md:mb-28 timeline-item">
+                            <div class="flex flex-col md:flex-row items-center">
+                                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 mt-6 md:mt-0">
+                                    <h3 class="font-bold text-xl mb-2">参与北伐战争</h3>
+                                    <p class="text-gray-600">1926年，王尔琢参加北伐战争，任国民革命军第3军第26团党代表，在战斗中表现出色，展现出卓越的军事指挥才能。</p>
+                                </div>
+                                <div class="absolute left-0 md:left-1/2 w-6 h-6 rounded-full bg-primary shadow-lg transform md:translate-x-[-50%] z-10 order-1 md:order-2 timeline-dot"></div>
+                                <div class="md:w-1/2 md:pl-12 order-3"></div>
+                                <div class="md:hidden order-1 text-primary font-bold">1926年</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 时间点4 -->
+                        <div class="relative mb-20 md:mb-28 timeline-item">
+                            <div class="flex flex-col md:flex-row items-center">
+                                <div class="md:w-1/2 md:pr-12 order-1"></div>
+                                <div class="absolute left-0 md:left-1/2 w-6 h-6 rounded-full bg-primary shadow-lg transform md:translate-x-[-50%] z-10 order-2 timeline-dot"></div>
+                                <div class="md:w-1/2 md:pl-12 order-3 mt-6 md:mt-0">
+                                    <div class="md:hidden text-primary font-bold mb-2">1927年</div>
+                                    <h3 class="font-bold text-xl mb-2">领导南昌起义</h3>
+                                    <p class="text-gray-600">1927年8月1日，王尔琢参与领导南昌起义，任起义军第11军第25师第74团参谋长，率部参加了多次激烈战斗。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 时间点5 -->
+                        <div class="relative mb-20 md:mb-28 timeline-item">
+                            <div class="flex flex-col md:flex-row items-center">
+                                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 mt-6 md:mt-0">
+                                    <h3 class="font-bold text-xl mb-2">井冈山会师</h3>
+                                    <p class="text-gray-600">1928年4月，王尔琢随朱德、陈毅率领的南昌起义余部和湘南起义农军抵达井冈山，与毛泽东领导的秋收起义部队胜利会师，成立中国工农红军第四军。</p>
+                                </div>
+                                <div class="absolute left-0 md:left-1/2 w-6 h-6 rounded-full bg-primary shadow-lg transform md:translate-x-[-50%] z-10 order-1 md:order-2 timeline-dot"></div>
+                                <div class="md:w-1/2 md:pl-12 order-3"></div>
+                                <div class="md:hidden order-1 text-primary font-bold">1928年4月</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 时间点6 -->
+                        <div class="relative timeline-item">
+                            <div class="flex flex-col md:flex-row items-center">
+                                <div class="md:w-1/2 md:pr-12 order-1"></div>
+                                <div class="absolute left-0 md:left-1/2 w-6 h-6 rounded-full bg-primary shadow-lg transform md:translate-x-[-50%] z-10 order-2 timeline-dot"></div>
+                                <div class="md:w-1/2 md:pl-12 order-3 mt-6 md:mt-0">
+                                    <div class="md:hidden text-primary font-bold mb-2">1928年8月</div>
+                                    <h3 class="font-bold text-xl mb-2">英勇牺牲</h3>
+                                    <p class="text-gray-600">1928年8月25日，在江西崇义思顺墟追击叛徒时，王尔琢不幸中弹牺牲，年仅25岁。毛泽东为其写下挽联："一哭尔琢，二哭尔琢，尔琢今已矣！留却重任谁承受？生为阶级，死为阶级，阶级后如何？得到胜利方始休！"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 章节分隔线 -->
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+
+        <!-- 第二部分：军事生涯 -->
+        <section id="military-career" class="py-24 bg-gray-50/90">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-20">
+                    <div class="inline-block bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-medium mb-4">
+                        军事生涯
+                    </div>
+                    <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold mb-6">沙场驰骋的<span class="text-primary">红军骁将</span></h2>
+                    <p class="text-gray-600">回顾王尔琢的军事才能与辉煌战绩</p>
+                </div>
+
+                <!-- 军事成就 -->
+                <div class="mb-24">
+                    <!-- 黄洋界保卫战 -->
+                    <div class="bg-white rounded-xl shadow-lg p-8 mb-12">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- 左侧：战役图片 -->
+                            <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100 h-full">
+                                <div class="h-64 overflow-hidden">
+                                    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/b6d0697bfad6446598ecabaee700185e~tplv-a9rns2rl98-image.image?rcl=20251016215446BB95A8AA7D50E7F72BD1&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1761227686&amp;x-signature=8oCHkah8aDPs8%2F6upgilsW3esjk%3D" alt="黄洋界保卫战" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full">1928年8月</span>
+                                        <span class="text-gray-500 text-sm"><i class="fa fa-map-marker mr-1"></i> 江西井冈山</span>
+                                    </div>
+                                    <h3 class="text-xl font-bold mb-3">黄洋界保卫战</h3>
+                                    <p class="text-gray-600 text-sm mb-4">
+                                        这是王尔琢军事生涯的经典战役。在毛泽东、朱德不在井冈山的情况下，他指挥不足一个营的兵力，凭借黄洋界天险，击退了国民党军4个团的进攻，创造了红军以少胜多的著名战例。
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- 右侧：战况经过和战役特点与影响 -->
+                            <div class="flex flex-col gap-3">
+                                <!-- 战况经过 -->
+                                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                                    <h3 class="text-xl font-bold mb-3 flex items-center">
+                                        <i class="fa fa-history text-primary mr-2"></i> 战况经过
+                                    </h3>
+                                    <div class="space-y-2 text-gray-700">
+                                        <p class="text-sm">1928年8月30日，国民党军第8师2个团向黄洋界哨口发起进攻。王尔琢指挥红四军第31团第1营的两个连，依托天险构筑工事，顽强抵抗。</p>
+                                        <p class="text-sm">红军战士将仅有的一门迫击炮和三发炮弹集中使用，其中一发命中敌军指挥所。敌军误以为毛泽东、朱德率主力返回，连夜撤退。</p>
+                                        <p class="text-sm">此次战役，红军以不足一个营的兵力，成功击退国民党军4个团的进攻，创造了革命战争史上的经典战例。</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- 战役特点与影响 -->
+                                <div class="bg-primary/5 p-6 rounded-xl shadow-md">
+                                    <h3 class="text-xl font-bold mb-3 flex items-center">
+                                        <i class="fa fa-star text-primary mr-2"></i> 战役特点与影响
+                                    </h3>
+                                    <ul class="space-y-2 text-gray-700">
+                                        <li class="flex items-start">
+                                            <i class="fa fa-check-circle text-primary mt-1 mr-3"></i>
+                                            <span>充分利用地形优势，构筑防御工事，以逸待劳</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fa fa-check-circle text-primary mt-1 mr-3"></i>
+                                            <span>动员群众参与，军民协作，形成了铜墙铁壁</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fa fa-check-circle text-primary mt-1 mr-3"></i>
+                                            <span>集中有限火力，在关键时刻给予敌人沉重打击</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fa fa-check-circle text-primary mt-1 mr-3"></i>
+                                            <span>极大地鼓舞了红军士气，坚定了革命必胜信念</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fa fa-check-circle text-primary mt-1 mr-3"></i>
+                                            <span>是毛泽东"工农武装割据"思想的成功实践</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 军事才能 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-white p-8 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg">
+                            <div class="flex items-start">
+                                <div class="bg-primary/10 p-3 rounded-lg mr-6">
+                                    <i class="fa fa-crosshairs text-primary text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-3">战术指挥灵活</h3>
+                                    <p class="text-gray-600">在实战中，王尔琢展现出卓越的战术指挥能力，善于根据战场形势灵活调整战术。他尤其擅长山地作战和游击战，多次以少胜多，取得关键性胜利，被誉为"红军中的赵子龙"。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-8 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg">
+                            <div class="flex items-start">
+                                <div class="bg-primary/10 p-3 rounded-lg mr-6">
+                                    <i class="fa fa-map-o text-primary text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-3">战略眼光独到</h3>
+                                    <p class="text-gray-600">王尔琢具有敏锐的战略眼光，在革命关键时刻总能提出正确的军事策略。他坚决支持毛泽东提出的"工农武装割据"思想，主张建立农村革命根据地，为红军的发展指明了方向。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-8 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg">
+                            <div class="flex items-start">
+                                <div class="bg-primary/10 p-3 rounded-lg mr-6">
+                                    <i class="fa fa-users text-primary text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold mb-3">部队建设有方</h3>
+                                    <p class="text-gray-600">王尔琢重视部队建设，注重提高士兵的政治觉悟和军事素质。他亲手训练的红四军第28团战斗力强，纪律严明，成为红军的主力部队，在多次战斗中发挥了关键作用。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    
+
+                
+                <!-- 主要战役 -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-10 text-center">王尔琢参与的<span class="text-primary">主要战役</span></h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                        <!-- 战役卡片1 -->
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer">
+                            <div class="h-48 overflow-hidden">
+                                <img src="https://x0.ifengimg.com/ucms/2021_05/9FCA8332C90F70E23A30EE8C91440DD66AEA7315_size66_w609_h342.jpg" alt="南昌起义" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full">1927年8月</span>
+                                    <span class="text-gray-500 text-sm"><i class="fa fa-map-marker mr-1"></i> 江西南昌</span>
+                                </div>
+                                <h3 class="text-xl font-bold mb-3">南昌起义</h3>
+                                <p class="text-gray-600 text-sm mb-4">
+                                    王尔琢参与领导南昌起义，任起义军第11军第25师第74团参谋长。起义爆发后，他率部英勇作战，为起义胜利作出重要贡献。起义失败后，他随部队南下，坚持武装斗争。
+                                </p>
+                                <div class="mt-4">
+                                    <button id="nanchang-uprising-btn" class="flex items-center text-primary hover:text-primary/80 transition-colors bg-primary/5 px-4 py-2 rounded-full text-sm font-medium">
+                                        <i class="fa fa-play-circle mr-2"></i> 武装反抗第一枪
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 战役卡片2 -->
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer">
+                            <div class="h-48 overflow-hidden">
+                                <img src="https://img1.voc.com.cn/UpLoadFile/2016/11/26/201611261318096066.jpg" alt="湘南起义" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full">1928年1月</span>
+                                    <span class="text-gray-500 text-sm"><i class="fa fa-map-marker mr-1"></i> 湖南南部</span>
+                                </div>
+                                <h3 class="text-xl font-bold mb-3">湘南起义</h3>
+                                <p class="text-gray-600 text-sm mb-4">
+                                    王尔琢协助朱德、陈毅领导湘南起义，任工农革命军第1师参谋长。他参与制定作战计划，指挥部队多次击败国民党军的进攻，有力地推动了湘南地区革命运动的发展。
+                                </p>
+                                <div class="mt-4">
+                                    <button id="xiangnan-uprising-btn" class="flex items-center text-primary hover:text-primary/80 transition-colors bg-primary/5 px-4 py-2 rounded-full text-sm font-medium">
+                                        <i class="fa fa-play-circle mr-2"></i> 漫天星火
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 战役卡片3 -->
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer">
+                            <div class="h-48 overflow-hidden">
+                                <img src="https://img.pconline.com.cn/images/upload/upc/tx/photoblog/1412/03/c2/193032_193032_1417594256677.jpg" alt="龙源口战斗" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full">1928年6月</span>
+                                    <span class="text-gray-500 text-sm"><i class="fa fa-map-marker mr-1"></i> 江西井冈山</span>
+                                </div>
+                                <h3 class="text-xl font-bold mb-3">龙源口战斗</h3>
+                                <p class="text-gray-600 text-sm mb-4">
+                                    王尔琢率红四军第28团担任主攻，采用灵活战术，在龙源口地区大败国民党军，歼敌千余人，缴枪千余支，取得了井冈山革命根据地创建以来最大的一次胜利，被称为"龙源口大捷"。
+                                </p>
+                                <div class="mt-4">
+                                    <button id="longyuankou-battle-btn" class="flex items-center text-primary hover:text-primary/80 transition-colors bg-primary/5 px-4 py-2 rounded-full text-sm font-medium">
+                                        <i class="fa fa-play-circle mr-2"></i> 史诗大捷
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 战役统计 -->
+                    <div class="mt-20 bg-white p-8 rounded-xl shadow-lg">
+                        <h3 class="text-xl font-bold mb-6 text-center">王尔琢军事生涯<span class="text-primary">战绩统计</span></h3>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <canvas id="battleChart" width="400" height="300"></canvas>
+                            </div>
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="font-bold text-lg mb-3 flex items-center">
+                                        <i class="fa fa-bar-chart text-primary mr-2"></i> 作战数据分析
+                                    </h4>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <div class="flex justify-between mb-1">
+                                                <span class="text-sm font-medium">胜率</span>
+                                                <span class="text-sm font-bold text-primary">85%</span>
+                                            </div>
+                                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                                <div class="bg-primary h-2 rounded-full" style="width: 85%"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between mb-1">
+                                                <span class="text-sm font-medium">以少胜多战役</span>
+                                                <span class="text-sm font-bold text-primary">6次</span>
+                                            </div>
+                                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                                <div class="bg-primary h-2 rounded-full" style="width: 75%"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between mb-1">
+                                                <span class="text-sm font-medium">指挥重大战役</span>
+                                                <span class="text-sm font-bold text-primary">8次</span>
+                                            </div>
+                                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                                <div class="bg-primary h-2 rounded-full" style="width: 80%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-primary/5 p-6 rounded-lg border border-primary/20">
+                                    <h4 class="font-bold mb-3">军事才能总结</h4>
+                                    <p class="text-gray-700 text-sm">
+                                        王尔琢是红军早期杰出的军事指挥员，他将黄埔军校学到的军事理论与中国革命实际相结合，形成了一套适合中国革命战争的战术思想。他擅长山地作战和游击战术，注重军民结合，多次创造以少胜多的战例，为红军早期军事思想的形成作出了重要贡献。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 南昌起义视频小卡片 -->
+        <div id="nanchang-video-card" class="fixed z-50 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl w-full max-w-md p-4 opacity-0 invisible transition-all duration-300">
+            <div class="relative">
+                <button id="close-video-card" class="absolute top-3 right-3 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors z-10">
+                    <i class="fa fa-times"></i>
+                </button>
+                <div class="aspect-w-16 aspect-h-9 bg-gray-900 rounded-lg overflow-hidden relative">
+                    <div id="nanchang-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 text-white z-10">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                        <p class="text-sm">资源加载中，若长时间无响应请按F5刷新页面或退出网页重试</p>
+                    </div>
+                    <video id="nanchang-video" src="https://raw.githubusercontent.com/shimengru0410/mywork/main/Vedio2.mp4" class="w-full h-full object-contain" controls preload="metadata" playsinline muted>
+                          您的浏览器不支持视频播放。
+                      </video>
+                      <script>
+                          // 添加视频错误处理和加载状态
+                          (function() {
+                              const videoElement = document.getElementById('nanchang-video');
+                              const loadingElement = document.getElementById('nanchang-loading');
+                                
+                              // 监听加载事件
+                              videoElement.addEventListener('loadeddata', function() {
+                                  loadingElement.style.display = 'none';
+                              });
+                                
+                              // 监听错误事件
+                              videoElement.addEventListener('error', function(e) {
+                                  console.error('南昌起义视频加载失败:', e);
+                                  loadingElement.innerHTML = '<p class="text-red-400">视频加载失败，请按F5刷新页面重试</p>';
+                              });
+                          })();
+                      </script>
+                </div>
+                <div class="mt-4 text-center">
+                    <h4 class="font-bold text-lg text-primary">南昌起义</h4>
+                    <p class="text-gray-600 text-sm mt-2">打响武装反抗国民党反动派的第一枪</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 背景遮罩 -->
+        <div id="video-overlay" class="fixed inset-0 bg-black/70 z-40 opacity-0 invisible transition-opacity duration-300"></div>
+
+        <!-- 龙源口战役视频小卡片 -->
+        <div id="longyuankou-video-card" class="fixed z-50 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl w-full max-w-md p-4 opacity-0 invisible transition-all duration-300">
+            <div class="relative">
+                <button id="close-longyuankou-video" class="absolute top-3 right-3 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors z-10">
+                    <i class="fa fa-times"></i>
+                </button>
+                <div class="aspect-w-16 aspect-h-9 bg-gray-900 rounded-lg overflow-hidden relative">
+                    <div id="longyuankou-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 text-white z-10">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                        <p class="text-sm">资源加载中，若长时间无响应请按F5刷新页面或退出网页重试</p>
+                    </div>
+                    <video id="longyuankou-video" src="https://raw.githubusercontent.com/shimengru0410/mywork/main/Vedio1.mp4" class="w-full h-full object-contain" controls preload="metadata" playsinline muted>
+                        您的浏览器不支持视频播放。
+                    </video>
+                    <script>
+                        (function() {
+                            const videoElement = document.getElementById('longyuankou-video');
+                            const loadingElement = document.getElementById('longyuankou-loading');
+                            if (videoElement) {
+                                // 监听加载事件
+                                videoElement.addEventListener('loadeddata', function() {
+                                    loadingElement.style.display = 'none';
+                                });
+                                
+                                // 监听错误事件
+                                videoElement.addEventListener('error', function(e) {
+                                    console.error('龙源口战役视频加载失败:', e);
+                                    loadingElement.innerHTML = '<p class="text-red-400">视频加载失败，请按F5刷新页面重试</p>';
+                                });
+                            }
+                        })();
+                        </script>
+                </div>
+                <div class="mt-4 text-center">
+                    <h4 class="font-bold text-lg text-primary">龙源口战役</h4>
+                    <p class="text-gray-600 text-sm mt-2">井冈山时期最大胜利，歼敌千余人</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 湘南起义视频小卡片 -->
+        <div id="xiangnan-video-card" class="fixed z-50 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl w-full max-w-md p-4 opacity-0 invisible transition-all duration-300">
+            <div class="relative">
+                <button id="close-xiangnan-video" class="absolute top-3 right-3 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors z-10">
+                    <i class="fa fa-times"></i>
+                </button>
+                <div class="aspect-w-16 aspect-h-9 bg-gray-900 rounded-lg overflow-hidden relative">
+                    <div id="xiangnan-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 text-white z-10">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                        <p class="text-sm">资源加载中，若长时间无响应请按F5刷新页面或退出网页重试</p>
+                    </div>
+                    <video id="xiangnan-video" src="https://raw.githubusercontent.com/shimengru0410/mywork/main/Vedio3.mp4" class="w-full h-full object-contain" controls preload="metadata" playsinline muted>
+                        您的浏览器不支持视频播放。
+                    </video>
+                    <script>
+                        // 添加视频错误处理和加载状态
+                        (function() {
+                            const videoElement = document.getElementById('xiangnan-video');
+                            const loadingElement = document.getElementById('xiangnan-loading');
+                            
+                            // 监听加载事件
+                            videoElement.addEventListener('loadeddata', function() {
+                                loadingElement.style.display = 'none';
+                            });
+                            
+                            // 监听错误事件
+                            videoElement.addEventListener('error', function(e) {
+                                    console.error('湘南起义视频加载失败:', e);
+                                    loadingElement.innerHTML = '<p class="text-red-400">视频加载失败，请按F5刷新页面重试</p>';
+                            });
+                        })();
+                    </script>
+                </div>
+                <div class="mt-4 text-center">
+                    <h4 class="font-bold text-lg text-primary">湘南起义</h4>
+                    <p class="text-gray-600 text-sm mt-2">建立多个苏维埃政权，推动湘南地区革命运动发展</p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // 南昌起义视频交互功能
+            const nanchangBtn = document.getElementById('nanchang-uprising-btn');
+            const videoCard = document.getElementById('nanchang-video-card');
+            const videoOverlay = document.getElementById('video-overlay');
+            const closeVideoBtn = document.getElementById('close-video-card');
+            const nanchangVideo = document.getElementById('nanchang-video');
+
+            // 打开视频卡片
+            nanchangBtn.addEventListener('click', function() {
+                videoCard.classList.remove('opacity-0', 'invisible');
+                videoOverlay.classList.remove('opacity-0', 'invisible');
+                // 暂停视频自动播放，让用户手动点击播放
+                nanchangVideo.pause();
+                // 防止背景滚动
+                document.body.style.overflow = 'hidden';
+            });
+
+            // 关闭视频卡片
+            function closeVideoCard() {
+                videoCard.classList.add('opacity-0', 'invisible');
+                videoOverlay.classList.add('opacity-0', 'invisible');
+                // 停止视频播放
+                nanchangVideo.pause();
+                nanchangVideo.currentTime = 0;
+                // 恢复背景滚动
+                document.body.style.overflow = '';
+            }
+
+            // 点击关闭按钮
+            closeVideoBtn.addEventListener('click', closeVideoCard);
+
+            // 点击遮罩层
+            videoOverlay.addEventListener('click', function() {
+                closeVideoCard();
+                closeXiangnanVideoCard();
+            });
+
+            // 龙源口战役视频交互功能
+            const longyuankouBtn = document.getElementById('longyuankou-battle-btn');
+            const longyuankouVideoCard = document.getElementById('longyuankou-video-card');
+            const closeLongyuankouBtn = document.getElementById('close-longyuankou-video');
+            const longyuankouVideo = document.getElementById('longyuankou-video');
+
+            // 打开龙源口战役视频卡片
+            longyuankouBtn.addEventListener('click', function() {
+                longyuankouVideoCard.classList.remove('opacity-0', 'invisible');
+                videoOverlay.classList.remove('opacity-0', 'invisible');
+                // 暂停视频自动播放，让用户手动点击播放
+                longyuankouVideo.pause();
+                // 防止背景滚动
+                document.body.style.overflow = 'hidden';
+            });
+
+            // 关闭龙源口战役视频卡片
+            function closeLongyuankouVideoCard() {
+                longyuankouVideoCard.classList.add('opacity-0', 'invisible');
+                videoOverlay.classList.add('opacity-0', 'invisible');
+                // 停止视频播放
+                longyuankouVideo.pause();
+                longyuankouVideo.currentTime = 0;
+                // 恢复背景滚动
+                document.body.style.overflow = '';
+            }
+
+            // 点击龙源口战役关闭按钮
+            closeLongyuankouBtn.addEventListener('click', closeLongyuankouVideoCard);
+
+            // 更新遮罩层点击事件，关闭所有视频卡片
+            videoOverlay.addEventListener('click', function() {
+                closeVideoCard();
+                closeXiangnanVideoCard();
+                closeLongyuankouVideoCard();
+            });
+
+            // 按ESC键关闭任意视频卡片
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    if (!videoCard.classList.contains('invisible')) {
+                        closeVideoCard();
+                    }
+                    if (!xiangnanVideoCard.classList.contains('invisible')) {
+                        closeXiangnanVideoCard();
+                    }
+                    if (!longyuankouVideoCard.classList.contains('invisible')) {
+                        closeLongyuankouVideoCard();
+                    }
+                }
+            });
+
+            // 湘南起义视频交互功能
+            const xiangnanBtn = document.getElementById('xiangnan-uprising-btn');
+            const xiangnanVideoCard = document.getElementById('xiangnan-video-card');
+            const closeXiangnanBtn = document.getElementById('close-xiangnan-video');
+            const xiangnanVideo = document.getElementById('xiangnan-video');
+
+            // 打开湘南起义视频卡片
+            xiangnanBtn.addEventListener('click', function() {
+                xiangnanVideoCard.classList.remove('opacity-0', 'invisible');
+                videoOverlay.classList.remove('opacity-0', 'invisible');
+                // 暂停视频自动播放，让用户手动点击播放
+                xiangnanVideo.pause();
+                // 防止背景滚动
+                document.body.style.overflow = 'hidden';
+            });
+
+            // 关闭湘南起义视频卡片
+            function closeXiangnanVideoCard() {
+                xiangnanVideoCard.classList.add('opacity-0', 'invisible');
+                videoOverlay.classList.add('opacity-0', 'invisible');
+                // 停止视频播放
+                xiangnanVideo.pause();
+                xiangnanVideo.currentTime = 0;
+                // 恢复背景滚动
+                document.body.style.overflow = '';
+            }
+
+            // 点击关闭按钮
+            closeXiangnanBtn.addEventListener('click', closeXiangnanVideoCard);
+
+
+        </script>
+
+        <!-- 章节分隔线 -->
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+
+        <!-- 第三部分：精神传承 -->
+        <section id="legacy" class="py-24 bg-white/90">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-20">
+                    <div class="inline-block bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-medium mb-4">
+                        精神传承
+                    </div>
+                    <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold mb-6">永垂不朽的<span class="text-primary">革命精神</span></h2>
+                    <p class="text-gray-600">王尔琢的革命精神和崇高品德永远值得我们学习和传承</p>
+                </div>
+
+                <!-- 托孤书板块 -->
+                <div class="bg-white p-8 rounded-xl shadow-lg mb-16 letter-container">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold">一字一泪托孤书</h3>
+                        <button id="open-letter-modal" class="flex items-center text-primary hover:text-primary/80 transition-colors">
+                            <span>查看详情</span>
+                            <i class="fa fa-external-link ml-2"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="relative h-[400px] bg-gray-100 rounded-lg overflow-hidden">
+                        <div id="letter-section-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-700 z-10">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                            <p class="text-sm">资源加载中，若长时间无响应请按F5刷新页面或退出网页重试</p>
+                        </div>
+                        <video id="letter-section-video" src="https://raw.githubusercontent.com/shimengru0410/mywork/main/Vedio1.mp4" class="w-full h-full object-contain" controls poster="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/019d5847062844b0be4a70412df5983b~tplv-a9rns2rl98-image.image?rcl=20251016231736AE60AFFA1CD5FCB9393D&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1761232657&amp;x-signature=VfOGNh9nzW3V%2BLd6bLNpF7XeXvM%3D" preload="metadata" playsinline muted>
+                        您的浏览器不支持视频播放。
+                    </video>
+                    <script>
+                        (function() {
+                            const videoElement = document.getElementById('letter-section-video');
+                            const loadingElement = document.getElementById('letter-section-loading');
+                            if (videoElement) {
+                                // 监听加载事件
+                                videoElement.addEventListener('loadeddata', function() {
+                                    loadingElement.style.display = 'none';
+                                });
+                                
+                                // 监听错误事件
+                                videoElement.addEventListener('error', function(e) {
+                                    console.error('视频加载失败:', e);
+                                    loadingElement.innerHTML = '<p class="text-red-400">视频加载失败，请按F5刷新页面重试</p>';
+                                });
+                            }
+                        })();
+                    </script>
+                    </div>
+                    
+                    <div class="mt-6 p-6 bg-gray-50 rounded-lg">
+                        <h4 class="font-bold text-lg mb-4 text-primary">书信内容</h4>
+                        <p class="letter-content text-gray-700">父亲大人膝下敬禀者：</p>
+                        <p class="letter-content text-gray-700">凤翠母女此次来汉，未能见上一面，心中定为十分难受。她娘家父母双亡，儿又远在千里之外，望大人把她当做亲生女儿看待。见她如见儿一样。</p>
+                        <p class="letter-content text-gray-700">儿何尝不想念着骨肉的团聚？儿何尝不眷恋着家庭的亲密？但四.一二烈士们殷红的血迹，燃起了儿的满腔怒火，乱葬岗上孤儿寡母的哭声，斩断了儿的万缕归思。为了让千千万万的母亲和孩子能过上好日子，为了让白发苍苍的老人皆可乐享天年，儿已以身许国，革命不成功，立誓不回家。</p>
+                        <p class="letter-content text-gray-700">敬祝</p>
+                        <p class="letter-content text-gray-700 mt-4">福体康健</p>
+                        <p class="letter-content text-gray-700">不孝儿尔琢拜上</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-20">
+                    <div class="bg-gray-50 p-8 rounded-xl shadow-md border-t-4 border-primary transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
+                        <div class="text-primary text-4xl mb-6">
+                            <i class="fa fa-heart"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">坚定的革命信念</h3>
+                        <p class="text-gray-600">
+                            王尔琢对革命事业有着坚定的信念和执着的追求，即使在最困难的情况下也从未动摇。他放弃了优渥的生活，毅然投身革命，为实现理想不惜牺牲一切。
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-8 rounded-xl shadow-md border-t-4 border-primary transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
+                        <div class="text-primary text-4xl mb-6">
+                            <i class="fa fa-shield"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">英勇无畏的牺牲精神</h3>
+                        <p class="text-gray-600">
+                            在革命斗争中，王尔琢始终冲锋在前，英勇无畏。为了追击叛徒，他不顾个人安危，最终壮烈牺牲，用生命诠释了革命战士的忠诚与担当。
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-8 rounded-xl shadow-md border-t-4 border-primary transform transition-all duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
+                        <div class="text-primary text-4xl mb-6">
+                            <i class="fa fa-balance-scale"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">舍小家为大家的奉献精神</h3>
+                        <p class="text-gray-600">
+                            王尔琢为了革命事业，毅然告别家人，全身心投入革命斗争。他在给父母的信中写道："为了让千千万万的母亲和孩子能过上好日子，我决心牺牲个人一切。"
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 名人评价 -->
+                <div class="mb-20">
+                    <h3 class="text-2xl font-bold mb-10 text-center">革命先辈对王尔琢的<span class="text-primary">评价</span></h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 transform transition-all duration-300 hover:shadow-lg cursor-pointer">
+                            <div class="flex items-center mb-6">
+                                <div class="w-16 h-16 rounded-full overflow-hidden mr-4">
+                                    <img src="http://art.people.com.cn/NMediaFile/2016/1223/MAIN201612231457000313080429359.jpg" alt="毛泽东" class="w-full h-full object-cover object-center" loading="lazy">
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg">毛泽东</h4>
+                                    <p class="text-gray-500 text-sm">中国共产党、中国人民解放军和中华人民共和国的主要缔造者和领导人</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-lg italic text-gray-700 relative">
+                                <i class="fa fa-quote-left text-primary/30 text-4xl absolute -top-2 -left-2"></i>
+                                <p class="relative z-10">
+                                    "一哭尔琢，二哭尔琢，尔琢今已矣！留却重任谁承受？生为阶级，死为阶级，阶级后如何？得到胜利方始休！"
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 transform transition-all duration-300 hover:shadow-lg cursor-pointer">
+                            <div class="flex items-center mb-6">
+                                <div class="w-16 h-16 rounded-full overflow-hidden mr-4">
+                                    <img src="https://img.rednet.cn/2022/08-08/3ade7e43-b202-4565-870b-6df8c1b5df32.png" alt="朱德" class="w-full h-full object-cover object-center" loading="lazy">
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg">朱德</h4>
+                                    <p class="text-gray-500 text-sm">中国人民解放军的主要缔造者之一，中华人民共和国的开国元勋</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-lg italic text-gray-700 relative">
+                                <i class="fa fa-quote-left text-primary/30 text-4xl absolute -top-2 -left-2"></i>
+                                <p class="relative z-10">
+                                    "王尔琢是红军中难得的军事人才，他的牺牲是红军的重大损失。他为革命事业建立的功勋将永载史册。"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 精神的时代价值 -->
+                <div class="bg-primary/5 rounded-2xl overflow-hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2">
+                        <div class="p-8 lg:p-12 flex flex-col justify-center">
+                            <h3 class="text-2xl font-bold mb-6">革命精神的时代价值</h3>
+                            <div class="space-y-6 text-gray-700">
+                                <p>
+                                    王尔琢的革命精神在今天仍然具有重要的时代价值。他坚定的理想信念、无私的奉献精神和英勇的牺牲精神，为我们提供了宝贵的精神财富。
+                                </p>
+                                <p>
+                                    在新时代，我们要学习王尔琢等革命先烈的崇高精神，坚定理想信念，不忘初心，牢记使命，为实现中华民族伟大复兴的中国梦而努力奋斗。
+                                </p>
+                                <p>
+                                    王尔琢的事迹告诉我们，个人的生命虽然有限，但为人民利益和革命事业奉献的精神却可以永垂不朽。这种精神将永远激励着我们前进。
+                                </p>
+                            </div>
+                        </div>
+                        <div class="relative h-64 lg:h-auto">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/7cf615f6aac14fddbb57ab780c5fa4a2~tplv-a9rns2rl98-image.image?rcl=202510162214273D9132EFB878F815BA44&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1761228869&amp;x-signature=udCBPE5a1sQ1AqEobgnlWdHkkbI%3D" alt="王尔琢纪念馆" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+                <!-- 托孤书详情弹窗 -->
+                <div id="letter-modal" class="modal-overlay">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="text-xl font-bold">信息卡片</h3>
+                            <button class="modal-close" id="close-letter-modal">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="space-y-6">
+                                <div class="relative h-[300px] bg-gray-100 rounded-lg overflow-hidden mb-6">
+                                    <div id="modal-video-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-700 z-10">
+                                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                                        <p class="text-sm">资源加载中，若长时间无响应请按F5刷新页面或退出网页重试</p>
+                                    </div>
+                                    <video id="modal-video-element" src="https://raw.githubusercontent.com/shimengru0410/mywork/main/Vedio1.mp4" class="w-full h-full object-contain" controls poster="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/019d5847062844b0be4a70412df5983b~tplv-a9rns2rl98-image.image?rcl=20251016231736AE60AFFA1CD5FCB9393D&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1761232657&amp;x-signature=VfOGNh9nzW3V%2BLd6bLNpF7XeXvM%3D" preload="metadata" playsinline muted>
+                                        您的浏览器不支持视频播放。
+                                    </video>
+                                    <script>
+                                        (function() {
+                                            const modalVideoElement = document.getElementById('modal-video-element');
+                                            const loadingElement = document.getElementById('modal-video-loading');
+                                            if (modalVideoElement) {
+                                                // 监听加载事件
+                                                modalVideoElement.addEventListener('loadeddata', function() {
+                                                    loadingElement.style.display = 'none';
+                                                });
+                                                
+                                                // 监听错误事件
+                                                modalVideoElement.addEventListener('error', function(e) {
+                                                    console.error('模态框视频加载失败:', e);
+                                                    loadingElement.innerHTML = '<p class="text-red-400">视频加载失败，请按F5刷新页面重试</p>';
+                                                });
+                                            }
+                                        })();
+                                    </script>
+                                </div>
+                                
+                                <h4 class="font-bold text-lg mb-3 flex items-center">
+                                    <i class="fa fa-history text-primary mr-2"></i> 托孤书的历史背景
+                                </h4>
+                                <p class="text-gray-700">
+                                    王尔琢（1903-1928），字蕴璞，湖南石门县官桥村人。1924年考入黄埔军校第一期，同年秋加入中国共产党。他的托孤书写于1927年，是在大革命失败后的白色恐怖时期，他抱着随时为革命牺牲的决心，留给父母的遗书。1928年8月25日，王尔琢在江西崇义县思顺墟追击叛徒袁崇全时不幸牺牲，年仅25岁。
+                                </p>
+                                
+                                <h4 class="font-bold text-lg mb-3 mt-6 flex items-center">
+                                    <i class="fa fa-file-text-o text-primary mr-2"></i> 书信内容解析
+                                </h4>
+                                <p class="text-gray-700">
+                                    托孤书中，王尔琢表达了对父母养育之恩的感激和不能尽孝的遗憾，同时表明了自己为革命事业奋斗到底的决心。他写道："为了让千千万万的母亲和孩子能过上好日子，为了让白发苍苍的老人皆可享乐天年，儿已决意以身许国！革命不成功，立誓不回家。"
+                                </p>
+                                
+                                <h4 class="font-bold text-lg mb-3 mt-6 flex items-center">
+                                    <i class="fa fa-university text-primary mr-2"></i> 文物传承与纪念
+                                </h4>
+                                <p class="text-gray-700">
+                                    这封托孤书在王尔琢牺牲后被发现，成为他革命精神的重要见证。为纪念王尔琢，1968年崇义县人民政府在思顺乡墟背虎形岭上竖碑纪念，1969年建造了王尔琢烈士墓。王尔琢烈士陵园先后被列为江西省第一批省级重点烈士建筑物保护单位、赣州市爱国主义教育基地、江西省文物保护单位等。
+                                </p>
+                                
+                                <h4 class="font-bold text-lg mb-3 mt-6 flex items-center">
+                                    <i class="fa fa-star text-primary mr-2"></i> 历史意义与价值
+                                </h4>
+                                <p class="text-gray-700">
+                                    王尔琢牺牲后，朱德挥泪长叹："我军失去一位能将啊！"毛泽东对他作了极高的评价："王尔琢的牺牲，换回了两个连，稳定了红军，挽救了革命。"托孤书不仅是王尔琢个人革命精神的体现，更是无数革命先烈为理想信念牺牲奉献的缩影，激励着一代又一代中国人铭记历史，为国家富强、民族复兴而努力奋斗。
+                                </p>
+                                
+                                <div class="mt-6 p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
+                                    <h5 class="font-bold mb-2">毛泽东对王尔琢的评价</h5>
+                                    <p class="text-gray-700 italic">
+                                        "一哭尔琢，二哭尔琢，尔琢今已矣！留却重任谁承受？生为阶级，死为阶级，阶级后如何？得到胜利方始休！"
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="close-letter-modal-btn" class="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full transition-colors">
+                                关闭
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+        <!-- 章节分隔线 -->
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+
+        <!-- 第四部分：缅怀纪念 -->
+        <section id="commemoration" class="py-24 bg-gray-50/90">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-20">
+                    <div class="inline-block bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-medium mb-4">
+                        缅怀纪念
+                    </div>
+                    <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold mb-6">传承红色基因，<span class="text-primary">缅怀革命先烈</span></h2>
+                    <p class="text-gray-600">通过线上云游和寄语，表达对王尔琢烈士的深切缅怀</p>
+                </div>
+                
+                <!-- 纪念馆虚拟参观 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-20">
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer">
+                        <div class="h-60 overflow-hidden">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/38aa5f29cd084a7da69e0462b4c34195~tplv-a9rns2rl98-image.image?rcl=20251016220814C4D26E5077D8441A87A0&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1761228498&amp;x-signature=W7gqBjOLpRMnC0rGLCdvRTDfbdo%3D" alt="王尔琢烈士陵园" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-3">王尔琢烈士陵园</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                位于江西省崇义县思顺乡，是为纪念王尔琢烈士而建。陵园内有王尔琢烈士墓、纪念碑等，碑上刻有毛泽东同志题写的挽联。
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-500 text-sm"><i class="fa fa-map-marker mr-1"></i> 江西省崇义县</span>
+                                <button class="virtual-tour-btn bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-full text-sm transition-colors" data-site="cemetery">
+                                    虚拟参观 <i class="fa fa-external-link ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer">
+                        <div class="h-60 overflow-hidden">
+                            <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/9b976e41bde94c769dae927d8ccd6097~tplv-a9rns2rl98-image.image?rcl=20251016215956361FAB99016738446E63&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1761227996&amp;x-signature=O096RiVAWwqesVdE%2Bg%2BmFXhOcPk%3D" alt="王尔琢故居" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-3">王尔琢故居</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                位于湖南省石门县磨市镇王官桥村，是王尔琢烈士出生和早年生活的地方。故居内陈列着王尔琢烈士的生平事迹和相关文物。
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-500 text-sm"><i class="fa fa-map-marker mr-1"></i> 湖南省石门县</span>
+                                <button class="virtual-tour-btn bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-full text-sm transition-colors" data-site="former-residence">
+                                    虚拟参观 <i class="fa fa-external-link ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 跨时空对话 -->
+                <div class="bg-white p-10 rounded-xl shadow-lg mb-12">
+                    <h3 class="text-2xl font-bold mb-6 text-center">与先烈跨时空对话</h3>
+                    <p class="text-gray-600 text-center max-w-2xl mx-auto mb-8">
+                        穿越历史长河，与红军骁将王尔琢进行一次跨越时空的心灵对话
+                    </p>
+                    
+                    <div class="max-w-3xl mx-auto">
+                        <!-- 对话界面 -->
+                        <div id="dialog-container" class="bg-gray-50 p-6 rounded-lg mb-6 h-[400px] overflow-y-auto border-2 border-gray-300">
+                            <!-- 开场白 -->
+                            <div class="flex items-start mb-4">
+                                <div class="w-10 h-10 rounded-full bg-primary overflow-hidden mr-3 flex-shrink-0">
+                                    <img src="https://n.sinaimg.cn/translate/244/w449h595/20180601/PXQA-fzrwiaz6145306.jpg" alt="王尔琢" class="w-full h-full object-center" loading="lazy">
+                                </div>
+                                <div class="bg-primary text-white p-4 rounded-lg rounded-tl-none max-w-[80%]">
+                                    <p class="text-sm">你好，年轻人！我是王尔琢，一名平凡的红军战士，很高兴能通过这样的方式与你交流。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 预设问题 -->
+                        <div class="mb-6">
+                            <div class="flex flex-wrap gap-2">
+                                <button class="preset-question bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
+                                    您出身于一个优渥的商人家庭，为什么最终会走上革命这条道路呢 <i class="fa fa-paper-plane text-primary text-xs ml-1"></i>
+                                </button>
+                                <button class="preset-question bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
+                                    为了保下那些被叛徒胁迫的红军战士，您坚持劝降却因此牺牲，如果重来一次，您会为此后悔吗 <i class="fa fa-paper-plane text-primary text-xs ml-1"></i>
+                                </button>
+                                <button class="preset-question bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
+                                    您忙于革命事业，终身未能与自己的女儿见上一面，想必是相当遗憾吧 <i class="fa fa-paper-plane text-primary text-xs ml-1"></i>
+                                </button>
+                                <button class="preset-question bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
+                                    您曾说“革命不成功，立誓不回家”，那在您看来今天的中国革命算是成功了吗 <i class="fa fa-paper-plane text-primary text-xs ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 输入区域 -->
+                        <div class="flex">
+                            <input type="text" id="dialog-input" class="flex-1 p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" placeholder="请输入你的问题或直接点击上方预设问题...">
+                            <button id="send-message-btn" class="bg-primary hover:bg-primary/90 text-white font-medium py-3 px-6 rounded-r-lg transition-colors flex items-center justify-center">
+                                <i class="fa fa-paper-plane text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 缅怀寄语 -->
+                <div class="bg-white p-10 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold mb-6 text-center">缅怀寄语</h3>
+                    <p class="text-gray-600 text-center max-w-2xl mx-auto mb-8">
+                        留下您对革命先烈王尔琢的缅怀与寄语，传承红色基因，弘扬革命精神
+                    </p>
+                    
+                    <div class="max-w-2xl mx-auto">
+                        <textarea id="message-input" class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors resize-none" rows="4" placeholder="请输入您的缅怀寄语..."></textarea>
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="text-gray-500 text-sm">
+                                <span id="char-count">0</span> / 200 字
+                            </div>
+                            <button id="submit-message" class="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full transition-colors">
+                                提交寄语
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 寄语展示区 -->
+                    <div class="mt-10 max-w-3xl mx-auto">
+                        <h4 class="font-bold text-lg mb-4">缅怀寄语精选</h4>
+                        <div class="space-y-4" id="messages-container">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-2">
+                                            <i class="fa fa-user"></i>
+                                        </div>
+                                        <span class="font-medium">李先生</span>
+                                    </div>
+                                    <span class="text-gray-400 text-xs">2025-08-01</span>
+                                </div>
+                                <p class="text-gray-600 text-sm">我们生于一个和平繁荣的国家，不再需要做出那般家国难两全的残酷抉择。但我们同样肩负着时代重任。我们的"以身许国"，可以是潜心科研攻克"卡脖子"的技术难题，可以是扎根基层助力乡村振兴，可以是在平凡的岗位上恪尽职守……将个人的理想追求融入党和国家的事业之中，这便是对先烈精神最好的继承。</p>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-2">
+                                            <i class="fa fa-user"></i>
+                                        </div>
+                                        <span class="font-medium">张同学</span>
+                                    </div>
+                                    <span class="text-gray-400 text-xs">2025-07-01</span>
+                                </div>
+                                <p class="text-gray-600 text-sm">信仰的力量何其强大。它能让人超越对死亡的恐惧，超越对亲情眷恋的本能，为了一个看不见摸不着的理想世界而倾尽所有。他没能看到1949年天安门城楼上的宣告，也没能看到今日之中国。但正是千千万万如他一般"未成功便成仁"的先烈，用血肉铺就了通往成功的阶梯。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-16">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div>
+                    <div class="flex items-center space-x-2 mb-6">
+                        <i class="fa fa-star text-tertiary text-xl"></i>
+                        <h3 class="text-xl font-title">红军骁将王尔琢</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        本网站旨在纪念红军骁将王尔琢，传承红色基因，弘扬革命精神，让更多人了解和学习革命先烈的英雄事迹。
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6">快速导航</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="#about" class="hover:text-tertiary transition-colors">英雄生平</a></li>
+                        <li><a href="#military-career" class="hover:text-tertiary transition-colors">军事生涯</a></li>
+                        <li><a href="#legacy" class="hover:text-tertiary transition-colors">精神传承</a></li>
+                        <li><a href="#commemoration" class="hover:text-tertiary transition-colors">缅怀纪念</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6">相关链接</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="https://www.jiangxihong.com/" class="hover:text-tertiary transition-colors">红色江西</a></li>
+                        <li><a href="https://jgsgmbwg.com/" class="hover:text-tertiary transition-colors">井冈山革命博物馆</a></li>
+                        <li><a href="http://www.81-china.com/" class="hover:text-tertiary transition-colors">南昌八一起义纪念馆</a></li>
+                        <li><a href="http://www.jb.mil.cn/" class="hover:text-tertiary transition-colors">中国人民革命军事博物馆</a></li>
+                    </ul>
+                </div>
+                
+
+            </div>
+            
+            <div class="mt-12 pt-8 border-t border-white/10 text-center text-gray-500 text-sm">
+                <p>© 2025 红色云游·红军骁将王尔琢 | 版权所有</p>
+                <p class="mt-2">本网站仅用于红色文化传播，缅怀革命先烈</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 对话板块JavaScript -->
+    <script>
+        // 预设回答
+        const presetResponses = {
+            "您出身于一个优渥的商人家庭，为什么最终会走上革命这条道路呢": "虽然我出身优渥，但在那个年代，国家动荡、民族危亡，普通百姓生活在水深火热之中。我在求学过程中接触到了马克思主义，认识到只有共产主义才能救中国。个人的荣华富贵与国家民族的命运相比微不足道。我渴望为改变旧中国的面貌贡献自己的力量，让更多的人能够过上有尊严的生活。这是我选择革命道路的根本原因。",
+            "为了保下那些被叛徒胁迫的红军战士，您坚持劝降却因此牺牲，如果重来一次，您会为此后悔吗": "如果重来一次，我依然会做出同样的选择。那些战士们大多是被欺骗和胁迫的穷苦兄弟，他们本不该成为革命的牺牲品。作为一名共产党员，保护同志、挽救误入歧途的革命群众是我的责任。革命需要牺牲，但每一个生命都值得被尊重和挽留。虽然我因此牺牲，但如果能唤醒更多人的觉悟，保全更多战士的生命，我的牺牲就是值得的。革命道路上难免流血牺牲，但我们的理想和信念永远不会改变。",
+            "您忙于革命事业，终身未能与自己的女儿见上一面，想必是相当遗憾吧": "作为一个父亲，不能亲眼见到自己的女儿，不能陪伴她成长，确实是我心中最大的遗憾。每当夜深人静时，我也会想起她，想象着她的样子，担心她的生活。但是，为了国家和民族的解放事业，我必须做出这样的牺牲。我相信我的女儿长大后会理解我，会为有这样的父亲而感到骄傲。我也希望她能生活在一个和平、幸福的新中国，这是我为之奋斗的目标，也是我送给她最好的礼物。",
+            "您曾说“革命不成功，立誓不回家”，那在您看来今天的中国革命算是成功了吗": "看到今天的中国，我感到无比欣慰和自豪！我们当年为之奋斗的目标已经实现：中国人民站起来了，国家繁荣富强，人民安居乐业。虽然我没能亲眼见证这一切，但无数革命先烈的鲜血没有白流。今天的中国正走在民族伟大复兴的道路上，这正是我们当年革命理想的延续。当然，革命事业永无止境，希望当代青年继续努力，为实现中华民族伟大复兴的中国梦而奋斗！"
+        };
+        
+        // 获取DOM元素
+        const dialogContainer = document.getElementById('dialog-container');
+        const dialogInput = document.getElementById('dialog-input');
+        const sendMessageBtn = document.getElementById('send-message-btn');
+        const presetQuestions = document.querySelectorAll('.preset-question');
+        
+        // 发送消息函数
+        function sendMessage(message) {
+            if (!message.trim()) return;
+            
+            // 添加用户消息
+            const userMessageHTML = `
+                <div class="flex items-start justify-end mb-4">
+                    <div class="bg-gray-200 text-gray-800 p-4 rounded-lg rounded-tr-none max-w-[80%]">
+                        <p class="text-sm">${message}</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gray-300 overflow-hidden ml-3 flex-shrink-0 flex items-center justify-center">
+                        <i class="fa fa-user text-gray-600"></i>
+                    </div>
+                </div>
+            `;
+            dialogContainer.insertAdjacentHTML('beforeend', userMessageHTML);
+            
+            // 清空输入框
+            dialogInput.value = '';
+            
+            // 滚动到底部
+            dialogContainer.scrollTop = dialogContainer.scrollHeight;
+            
+            // 模拟延迟后回复
+            setTimeout(() => {
+                // 智能回答选择逻辑
+                let response = presetResponses[message];
+                
+                if (!response) {
+                    // 基于关键词的回答选择
+                    const keywords = {
+                        '革命|理想|信念': "革命理想高于天。在那个动荡的年代，正是坚定的信仰支撑着我们前行。即使面临生死考验，我们也从未动摇。今天的和平生活来之不易，希望年轻人能够珍惜，并为实现中华民族伟大复兴的中国梦贡献自己的力量。",
+                        '牺牲|生命|奉献': "生命诚可贵，但为了国家和民族的利益，牺牲是值得的。我们这一代人的牺牲，是为了让更多人能够过上幸福的生活。看到今天强大的祖国，我感到无比欣慰，所有的付出都是值得的。",
+                        '家庭|亲情|女儿': "作为一个父亲，不能陪伴女儿成长是我最大的遗憾。但为了民族解放事业，我必须做出这样的选择。我相信她会理解，也希望她能生活在一个和平、幸福的新中国。这种遗憾，是时代赋予我们这一代人的责任。",
+                        '战友|同志|红军': "战友之间的情谊是革命年代最珍贵的财富。我们一起出生入死，为了共同的理想而奋斗。在战场上，我们彼此信任，互相支持。这种革命情谊超越了血缘，是我们战胜一切困难的力量源泉。",
+                        '今天|现在|未来': "看到今天的中国，我感到无比欣慰和自豪！我们当年为之奋斗的目标已经实现。希望当代青年能够珍惜这来之不易的和平环境，努力学习，勤奋工作，为国家的繁荣富强贡献自己的力量。",
+                        '建议|希望|寄语': "年轻人是国家的未来和希望。希望你们能够树立远大理想，脚踏实地，努力学习科学文化知识，培养创新精神和实践能力。同时，要继承和发扬革命先辈的优良传统，坚定理想信念，为实现中华民族伟大复兴而努力奋斗。"
+                    };
+                    
+                    // 查找匹配的关键词
+                    let matched = false;
+                    for (const [pattern, answer] of Object.entries(keywords)) {
+                        const regex = new RegExp(pattern, 'i');
+                        if (regex.test(message)) {
+                            response = answer;
+                            matched = true;
+                            break;
+                        }
+                    }
+                    
+                    // 如果没有匹配的关键词，使用通用回答
+                    if (!matched) {
+                        response = "作为一名红军战士，我的一生都献给了革命事业。虽然时代不同了，但我希望年轻人能够继承革命先辈的精神，热爱祖国，努力学习，为国家的繁荣富强贡献自己的力量。革命理想高于天，希望你们能够珍惜今天的和平生活，为实现中华民族伟大复兴而努力奋斗。";
+                    }
+                }
+                
+                const replyHTML = `
+                    <div class="flex items-start mb-4">
+                        <div class="w-10 h-10 rounded-full bg-primary overflow-hidden mr-3 flex-shrink-0">
+                             <img src="https://n.sinaimg.cn/translate/244/w449h595/20180601/PXQA-fzrwiaz6145306.jpg" alt="王尔琢" class="w-full h-full object-center" loading="lazy">
+                         </div>
+                        <div class="bg-primary text-white p-4 rounded-lg rounded-tl-none max-w-[80%]">
+                            <p class="text-sm">${response}</p>
+                        </div>
+                    </div>
+                `;
+                dialogContainer.insertAdjacentHTML('beforeend', replyHTML);
+                
+                // 滚动到底部
+                dialogContainer.scrollTop = dialogContainer.scrollHeight;
+            }, 1000);
+        }
+        
+        // 发送按钮点击事件
+        sendMessageBtn.addEventListener('click', () => {
+            sendMessage(dialogInput.value);
+        });
+        
+        // 回车键发送
+        dialogInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage(dialogInput.value);
+            }
+        });
+        
+        // 预设问题点击事件
+        presetQuestions.forEach(button => {
+            button.addEventListener('click', () => {
+                sendMessage(button.textContent.trim());
+            });
+        });
+    </script>
+    
+    <!-- 返回顶部按钮 -->
+    <button id="back-to-top" class="fixed bottom-10 right-10 bg-primary hover:bg-primary/90 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform transition-all duration-300 opacity-0 invisible hover:scale-110 hover:shadow-xl mobile-touch-target">
+            <i class="fa fa-arrow-up fa-mobile-visible"></i>
+    </button>
+
+    <!-- 虚拟参观模态框 -->
+    <div id="virtual-tour-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center">
+        <div class="relative w-full max-w-4xl max-h-[90vh]">
+            <button id="close-modal" class="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white z-10" onclick="document.getElementById('virtual-tour-modal').classList.add('hidden'); document.getElementById('virtual-tour-modal').style.display = 'none'; document.body.style.overflow = 'auto';">
+                <i class="fa fa-times"></i>
+            </button>
+            <div class="bg-white rounded-xl overflow-hidden h-full flex flex-col">
+                <div class="bg-primary text-white p-4">
+                    <h3 id="modal-title" class="text-xl font-bold">虚拟参观 - 王尔琢烈士陵园</h3>
+                </div>
+                <div class="flex-grow bg-gray-100 relative flex items-center justify-center p-4">
+                    <!-- 左侧切换按钮 -->
+                    <button class="virtual-tour-nav bg-white hover:bg-primary hover:text-white text-primary w-12 h-12 rounded-full flex items-center justify-center shadow-lg absolute left-4 top-1/2 transform -translate-y-1/2 z-10" data-direction="prev">
+                        <i class="fa fa-angle-left text-2xl fa-mobile-visible"></i>
+                    </button>
+                    
+                    <!-- 图片容器 -->
+                    <div class="virtual-tour-image-container" style="position: relative; width: 100%; height: 400px; overflow: hidden;">
+                        <img class="virtual-tour-image active" src="https://raw.githubusercontent.com/shimengru0410/mywork/main/139180_20160518234659418200_0.jpg" alt="王尔琢烈士陵园图片1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity 0.3s ease;">
+                        <img class="virtual-tour-image" src="https://raw.githubusercontent.com/shimengru0410/mywork/main/0c48cd9394124e57a255b843646ad73a.png" alt="王尔琢烈士陵园图片2" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity 0.3s ease;">
+                        <img class="virtual-tour-image" src="https://raw.githubusercontent.com/shimengru0410/mywork/main/9421e2668dec4c61a333f39d69d81f62~tplv-tt-origin-web_gif.jpeg" alt="王尔琢烈士陵园图片3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity 0.3s ease;">
+                    </div>
+                    
+                    <!-- 右侧切换按钮 -->
+                    <button class="virtual-tour-nav bg-white hover:bg-primary hover:text-white text-primary w-12 h-12 rounded-full flex items-center justify-center shadow-lg absolute right-4 top-1/2 transform -translate-y-1/2 z-10" data-direction="next">
+                        <i class="fa fa-angle-right text-2xl fa-mobile-visible"></i>
+                    </button>
+                    <div class="absolute top-4 left-0 right-0 flex justify-center space-x-2">
+                        <button class="virtual-tour-dot w-3 h-3 rounded-full bg-white/50 hover:bg-white active" data-index="0"></button>
+                        <button class="virtual-tour-dot w-3 h-3 rounded-full bg-white/50 hover:bg-white" data-index="1"></button>
+                        <button class="virtual-tour-dot w-3 h-3 rounded-full bg-white/50 hover:bg-white" data-index="2"></button>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t">
+                    <p id="virtual-tour-desc" class="text-gray-700 text-sm">
+                        王尔琢烈士陵园位于江西省崇义县思顺乡，是为纪念王尔琢烈士而建。陵园内有王尔琢烈士墓、纪念碑等，碑上刻有毛泽东同志题写的挽联。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                // 关闭移动端菜单
+                document.getElementById('mobile-menu').classList.add('hidden');
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // 防抖函数
+        function debounce(func, wait) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+
+        // 页面滚动进度处理
+        const handleScroll = debounce(function() {
+            const winScroll = window.scrollY || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            
+            // 缓存DOM元素引用
+            const progressBar = document.getElementById('progress-bar');
+            const backToTopBtn = document.getElementById('back-to-top');
+            const header = document.getElementById('main-header');
+            
+            // 更新进度条
+            progressBar.style.height = scrolled + '%';
+            
+            // 导航栏样式变化 - 避免不必要的类操作
+            const shouldHaveShadow = winScroll > 100;
+            if (shouldHaveShadow && !header.classList.contains('shadow-md')) {
+                header.classList.add('shadow-md');
+            } else if (!shouldHaveShadow && header.classList.contains('shadow-md')) {
+                header.classList.remove('shadow-md');
+            }
+            
+            // 返回顶部按钮显示/隐藏
+            const shouldShowBackToTop = winScroll > 300;
+            if (shouldShowBackToTop && backToTopBtn.classList.contains('opacity-0')) {
+                backToTopBtn.classList.remove('opacity-0', 'invisible');
+                backToTopBtn.classList.add('opacity-100', 'visible');
+            } else if (!shouldShowBackToTop && backToTopBtn.classList.contains('opacity-100')) {
+                backToTopBtn.classList.remove('opacity-100', 'visible');
+                backToTopBtn.classList.add('opacity-0', 'invisible');
+            }
+            
+            // 更新导航点状态
+            const sections = document.querySelectorAll('section[id]');
+            let activeSection = null;
+            
+            // 找出当前活动的section
+            for (let i = sections.length - 1; i >= 0; i--) {
+                const sectionTop = sections[i].offsetTop - 100;
+                if (winScroll >= sectionTop) {
+                    activeSection = sections[i];
+                    break;
+                }
+            }
+            
+            // 更新导航点样式
+            if (activeSection) {
+                const sectionId = activeSection.getAttribute('id');
+                const dots = document.querySelectorAll('.progress-dot');
+                
+                dots.forEach(dot => {
+                    if (dot.getAttribute('href') === `#${sectionId}`) {
+                        dot.classList.remove('bg-gray-300');
+                        dot.classList.add('bg-primary');
+                    } else {
+                        dot.classList.remove('bg-primary');
+                        dot.classList.add('bg-gray-300');
+                    }
+                });
+            }
+            
+            // 时间线动画 - 使用节流以提高性能
+            animateTimeline();
+        }, 50); // 50ms防抖
+
+        // 添加滚动事件监听 - 仅添加一次，并使用passive选项提高性能
+        if (typeof handleScroll === 'function') {
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        }
+
+        // 返回顶部功能
+        document.getElementById('back-to-top').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 战役统计图表 - 使用延迟初始化提升页面加载性能
+        function initBattleChart() {
+            const chartElement = document.getElementById('battleChart');
+            if (!chartElement) return;
+            
+            // 检查Chart.js是否已加载
+            if (typeof Chart !== 'undefined') {
+                const battleChartCtx = chartElement.getContext('2d');
+                const battleChart = new Chart(battleChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['南昌起义', '湘南起义', '井冈山会师', '五斗江战斗', '草市坳战斗', '龙源口战斗', '黄洋界保卫战'],
+                        datasets: [{
+                            label: '我军兵力',
+                            data: [3000, 2000, 4000, 800, 1000, 1500, 300],
+                            backgroundColor: 'rgba(199, 31, 55, 0.7)',
+                            borderColor: 'rgba(199, 31, 55, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: '敌军兵力',
+                            data: [10000, 8000, 15000, 2000, 3000, 5000, 2000],
+                            backgroundColor: 'rgba(140, 140, 140, 0.7)',
+                            borderColor: 'rgba(140, 140, 140, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 1500, // 适度的动画时长
+                            easing: 'easeOutQuart'
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: '主要战役兵力对比'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '兵力数量'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toLocaleString(); // 数字格式化
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 虚拟参观功能优化 - 使用图片预加载提升体验
+        function preloadImages(imageUrls) {
+            imageUrls.forEach(url => {
+                const img = new Image();
+                img.src = url;
+            });
+        }
+        
+        // 在初始化虚拟参观时预加载图片
+        function enhanceVirtualTour() {
+            // 收集所有虚拟参观图片URL
+            const allImageUrls = [];
+            for (const key in imageData) {
+                if (imageData[key] && imageData[key].images) {
+                    imageData[key].images.forEach(img => {
+                        if (typeof img === 'string') {
+                            allImageUrls.push(img);
+                        } else if (img && img.url) {
+                            allImageUrls.push(img.url);
+                        }
+                    });
+                }
+            }
+            
+            // 使用IntersectionObserver在用户接近虚拟参观区域时预加载图片
+            const tourSection = document.querySelector('[data-section="virtual-tour"]') || 
+                              document.querySelector('.virtual-tour-btn').closest('section');
+            if (tourSection && allImageUrls.length > 0) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            preloadImages(allImageUrls);
+                            observer.disconnect(); // 只预加载一次
+                        }
+                    });
+                }, { rootMargin: '200px' }); // 提前200px开始预加载
+                
+                observer.observe(tourSection);
+            }
+        }
+
+        // 虚拟参观功能 - 优化版
+        // 缓存DOM元素引用
+        const virtualTourElements = {
+            btns: document.querySelectorAll('.virtual-tour-btn'),
+            modal: document.getElementById('virtual-tour-modal'),
+            closeBtn: document.getElementById('close-modal'),
+            title: document.getElementById('modal-title'),
+            desc: document.getElementById('virtual-tour-desc'),
+            container: null, // 将在初始化时设置
+            dotsContainer: null,
+            navButtons: null
+        };
+        
+        // 图片数据
+        const imageData = {
+            'former-residence': {
+                title: '虚拟参观 - 王尔琢故居',
+                desc: '王尔琢故居位于湖南省石门县磨市镇王官桥村，是王尔琢烈士出生和早年生活的地方。故居内陈列着王尔琢烈士的生平事迹和相关文物。',
+                images: [
+                    'https://raw.githubusercontent.com/shimengru0410/mywork/main/539d892c6a9645e0a71d6a1631833871.png',
+                    'https://raw.githubusercontent.com/shimengru0410/mywork/main/20240712112842921.jpg',
+                    'https://raw.githubusercontent.com/shimengru0410/mywork/main/c33e77736d247434acaee9101d8d6561.png'
+                ]
+            },
+            'cemetery': {
+                title: '虚拟参观 - 王尔琢烈士陵园',
+                desc: '王尔琢烈士陵园位于江西省崇义县思顺乡，是为纪念王尔琢烈士而建。陵园内有王尔琢烈士墓、纪念碑等，碑上刻有毛泽东同志题写的挽联。',
+                images: [
+                    'https://raw.githubusercontent.com/shimengru0410/mywork/main/139180_20160518234659418200_0.jpg',
+                    'https://raw.githubusercontent.com/shimengru0410/mywork/main/0c48cd9394124e57a255b843646ad73a.png',
+                    'https://raw.githubusercontent.com/shimengru0410/mywork/main/9421e2668dec4c61a333f39d69d81f62~tplv-tt-origin-web_gif.jpeg'
+                ]
+            }
+        };
+        
+        // 状态变量
+        let currentImageSet = null;
+        let currentIndex = 0;
+        
+        // 初始化虚拟参观功能（只运行一次）
+        function initVirtualTour() {
+            if (!virtualTourElements.modal) return;
+            
+            // 缓存更多DOM元素
+            virtualTourElements.container = virtualTourElements.modal.querySelector('.virtual-tour-image-container');
+            const firstDot = virtualTourElements.modal.querySelector('.virtual-tour-dot');
+            virtualTourElements.dotsContainer = firstDot ? firstDot.parentElement : null;
+            virtualTourElements.navButtons = virtualTourElements.modal.querySelectorAll('.virtual-tour-nav');
+            
+            // 预设置容器样式，保持原有尺寸
+            if (virtualTourElements.container) {
+                virtualTourElements.container.style.cssText = `
+                    position: relative;
+                    width: 100%;
+                    height: 400px;
+                    overflow: hidden;
+                `;
+            }
+            
+            // 设置导航按钮样式
+            if (virtualTourElements.navButtons) {
+                virtualTourElements.navButtons.forEach(btn => {
+                    btn.style.zIndex = '100';
+                    btn.style.position = 'relative';
+                    btn.style.opacity = '1';
+                });
+                
+                // 添加导航按钮事件监听（只绑定一次）
+                virtualTourElements.navButtons[0]?.addEventListener('click', navigatePrev);
+                virtualTourElements.navButtons[1]?.addEventListener('click', navigateNext);
+            }
+            
+            // 绑定关闭事件（使用事件委托或单次绑定）
+            setupCloseModalEvents();
+            
+            // 绑定虚拟参观按钮事件
+            setupVirtualTourButtonEvents();
+        }
+        
+        // 设置虚拟参观按钮事件
+        function setupVirtualTourButtonEvents() {
+            virtualTourElements.btns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const site = this.getAttribute('data-site');
+                    const data = imageData[site];
+                    
+                    if (data) {
+                        openVirtualTourModal(data);
+                    }
+                });
+            });
+        }
+        
+        // 打开虚拟参观模态框 - 恢复原始的简单显示逻辑
+        function openVirtualTourModal(data) {
+            // 更新状态
+            currentImageSet = data;
+            currentIndex = 0;
+            
+            // 更新内容
+            if (virtualTourElements.title) virtualTourElements.title.textContent = data.title;
+            if (virtualTourElements.desc) virtualTourElements.desc.textContent = data.desc;
+            
+            // 更新图片和指示点
+            updateVirtualTourContent();
+            
+            // 显示模态框 - 简单直接的方式
+            if (virtualTourElements.modal) {
+                virtualTourElements.modal.classList.remove('hidden');
+                virtualTourElements.modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        // 更新虚拟参观内容 - 优化版
+        function updateVirtualTourContent() {
+            if (!currentImageSet || !virtualTourElements.container || !virtualTourElements.dotsContainer) return;
+            
+            // 优化：只在内容变化时才更新DOM
+            const images = currentImageSet.images;
+            if (!images || images.length === 0) return;
+            
+            // 使用DocumentFragment优化DOM操作，减少重排重绘
+            const imageFragment = document.createDocumentFragment();
+            const dotFragment = document.createDocumentFragment();
+            
+            // 预先创建图片加载器，确保图片质量
+            const imageLoaders = [];
+            
+            // 创建图片和指示点（批量处理）
+            images.forEach((imgSrc, index) => {
+                // 创建图片
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.alt = `虚拟参观图片${index + 1}`;
+                img.className = 'virtual-tour-image';
+                img.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                    opacity: ${index === 0 ? '1' : '0'};
+                    transition: opacity 0.5s ease;
+                    z-index: 1;
+                    transform: translateZ(0); /* 硬件加速 */
+                `;
+                
+                // 仅预加载第一张和下一张图片，其他使用懒加载
+                if (index === 0 || index === 1) {
+                    img.loading = 'eager';
+                } else {
+                    img.loading = 'lazy';
+                }
+                
+                // 保存图片加载器
+                imageLoaders.push(new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                }));
+                
+                // 添加到文档片段
+                imageFragment.appendChild(img);
+                
+                // 创建指示点
+                const dot = document.createElement('button');
+                dot.className = `virtual-tour-dot w-3 h-3 rounded-full ${index === 0 ? 'bg-white' : 'bg-white/50'} hover:bg-white`;
+                if (index === 0) dot.classList.add('active');
+                dot.dataset.index = index;
+                dot.style.zIndex = '10';
+                
+                // 优化事件监听器，使用事件委托的替代方案
+                dot.addEventListener('click', function() {
+                    const targetIndex = parseInt(this.dataset.index);
+                    if (!isNaN(targetIndex)) {
+                        showImage(targetIndex);
+                    }
+                });
+                
+                dotFragment.appendChild(dot);
+            });
+            
+            // 一次性DOM操作，大幅提升性能
+            virtualTourElements.container.textContent = '';
+            virtualTourElements.dotsContainer.textContent = '';
+            
+            virtualTourElements.container.appendChild(imageFragment);
+            virtualTourElements.dotsContainer.appendChild(dotFragment);
+            
+            // 预加载第一张图片完成后更新显示
+            Promise.all([imageLoaders[0]]).then(() => {
+                // 确保第一张图片正确显示
+                showImage(0);
+            }).catch(err => {
+                console.warn('图片加载失败:', err);
+            });
+        }
+        
+        // 显示指定索引的图片
+        function showImage(index) {
+            if (!currentImageSet || index < 0 || index >= currentImageSet.images.length) return;
+            
+            const images = virtualTourElements.container?.querySelectorAll('.virtual-tour-image');
+            const dots = virtualTourElements.dotsContainer?.querySelectorAll('.virtual-tour-dot');
+            
+            if (!images || !dots) return;
+            
+            // 优化：只更新变化的元素
+            for (let i = 0; i < images.length; i++) {
+                const isActive = (i === index);
+                
+                // 更新图片显示
+                images[i].style.opacity = isActive ? '1' : '0';
+                
+                // 更新指示点样式
+                if (isActive) {
+                    dots[i].classList.add('active', 'bg-white');
+                    dots[i].classList.remove('bg-white/50');
+                } else {
+                    dots[i].classList.remove('active', 'bg-white');
+                    dots[i].classList.add('bg-white/50');
+                }
+            }
+            
+            currentIndex = index;
+        }
+        
+        // 导航到上一张/下一张
+        function navigatePrev() {
+            if (!currentImageSet || !currentImageSet.images.length) return;
+            currentIndex = (currentIndex - 1 + currentImageSet.images.length) % currentImageSet.images.length;
+            showImage(currentIndex);
+        }
+        
+        function navigateNext() {
+            if (!currentImageSet || !currentImageSet.images.length) return;
+            currentIndex = (currentIndex + 1) % currentImageSet.images.length;
+            showImage(currentIndex);
+        }
+        
+        // 设置关闭模态框事件
+        function setupCloseModalEvents() {
+            // 关闭按钮事件
+            if (virtualTourElements.closeBtn) {
+                virtualTourElements.closeBtn.addEventListener('click', closeVirtualTourModal);
+            }
+            
+            // 点击模态框外部关闭
+            if (virtualTourElements.modal) {
+                virtualTourElements.modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeVirtualTourModal();
+                    }
+                });
+            }
+            
+            // 键盘ESC键关闭
+            document.addEventListener('keydown', function(e) {
+                if ((e.key === 'Escape' || e.keyCode === 27) && 
+                    virtualTourElements.modal && 
+                    !virtualTourElements.modal.classList.contains('hidden')) {
+                    closeVirtualTourModal();
+                }
+            });
+        }
+        
+        // 关闭模态框功能
+        function closeVirtualTourModal() {
+            if (virtualTourElements.modal) {
+                virtualTourElements.modal.classList.add('hidden');
+                virtualTourElements.modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // 移除自动初始化，由DOMContentLoaded事件统一初始化
+        // 这样可以确保所有DOM元素都已加载完成
+
+        // 缅怀寄语功能 - 优化版
+        // 缓存DOM元素引用并添加存在性检查
+        const messageElements = {
+            input: document.getElementById('message-input'),
+            charCount: document.getElementById('char-count'),
+            submitBtn: document.getElementById('submit-message'),
+            container: document.getElementById('messages-container')
+        };
+        
+        // 重用上面已定义的防抖函数，这里不再重复定义
+        
+        // 优化后的输入处理函数
+        const handleInput = debounce(function(e) {
+            if (!messageElements.charCount || !messageElements.input) return;
+            
+            const length = e.target.value.length;
+            
+            // 性能优化：只有当长度变化时才更新DOM
+            if (parseInt(messageElements.charCount.textContent) !== length) {
+                messageElements.charCount.textContent = length;
+            }
+            
+            // 限制字数
+            if (length > 200) {
+                e.target.value = e.target.value.substring(0, 200);
+                messageElements.charCount.textContent = '200';
+            }
+        }, 30); // 使用30ms延迟，提高性能
+        
+        // 优化后的提交函数
+        function handleSubmit() {
+            if (!messageElements.input || !messageElements.container) return;
+            
+            const message = messageElements.input.value.trim();
+            
+            if (message === '') {
+                alert('请输入您的缅怀寄语');
+                return;
+            }
+            
+            // 创建日期字符串（只计算一次）
+            const now = new Date();
+            const dateString = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+            
+            // 使用文档片段减少DOM重绘
+            const fragment = document.createDocumentFragment();
+            const messageElement = document.createElement('div');
+            messageElement.className = 'bg-gray-50 p-4 rounded-lg animate-fade-in';
+            
+            // 优化HTML字符串拼接
+            messageElement.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-2">
+                            <i class="fa fa-user"></i>
+                        </div>
+                        <span class="font-medium">访客</span>
+                    </div>
+                    <span class="text-gray-400 text-xs">${dateString}</span>
+                </div>
+                <p class="text-gray-600 text-sm">${message}</p>
+            `;
+            
+            fragment.appendChild(messageElement);
+            
+            // 添加到容器顶部（一次性DOM操作）
+            if (messageElements.container.firstChild) {
+                messageElements.container.insertBefore(fragment, messageElements.container.firstChild);
+            } else {
+                messageElements.container.appendChild(fragment);
+            }
+            
+            // 清空输入框和字符计数
+            messageElements.input.value = '';
+            if (messageElements.charCount) {
+                messageElements.charCount.textContent = '0';
+            }
+            
+            // 显示成功提示
+            alert('您的缅怀寄语已提交，感谢您的参与！');
+        }
+        
+        // 初始化缅怀寄语功能
+        function initMessageFunctionality() {
+            // 检查元素存在性
+            if (!messageElements.input || !messageElements.submitBtn) return;
+            
+            // 绑定输入事件（使用防抖）
+            messageElements.input.addEventListener('input', handleInput);
+            
+            // 绑定提交事件
+            messageElements.submitBtn.addEventListener('click', handleSubmit);
+            
+            // 添加Enter键提交功能
+            messageElements.input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    handleSubmit();
+                    e.preventDefault(); // 阻止默认行为
+                }
+            });
+        }
+        
+        // 移除单独的初始化调用，统一由DOMContentLoaded事件处理
+
+        // 时间线动画功能 - 优化版
+        function animateTimeline() {
+            // 元素存在性检查
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            if (!timelineItems.length) return;
+            
+            const timelineLine = document.querySelector('.timeline-line');
+            if (!timelineLine) return;
+            
+            // 性能优化：缓存window.innerHeight
+            const windowHeight = window.innerHeight;
+            
+            // 计算可见的时间线项目
+            let visibleCount = 0;
+            let hasHighlightedItem = false;
+            
+            // 优化处理：只对可见区域附近的元素进行处理
+            timelineItems.forEach((item, index) => {
+                const rect = item.getBoundingClientRect();
+                const isVisible = (rect.top < windowHeight - 100) && (rect.bottom > 0);
+                
+                if (isVisible) {
+                    // 避免重复添加类
+                    if (!item.classList.contains('visible')) {
+                        item.classList.add('visible');
+                    }
+                    visibleCount++;
+                    
+                    // 只高亮最接近视口中心的可见项，避免重复处理
+                    if (!hasHighlightedItem) {
+                        const centerDistance = Math.abs(rect.top + rect.height/2 - windowHeight/2);
+                        
+                        // 简单启发式：如果是当前可见项或距离视口中心较近
+                        if (index === 0 || centerDistance < 200) {
+                            item.classList.add('highlighted');
+                            hasHighlightedItem = true;
+                        }
+                    } else {
+                        item.classList.remove('highlighted');
+                    }
+                } else {
+                    // 仅移除不在视口中的项目的高亮状态
+                    if ((rect.bottom < 0 || rect.top > windowHeight) && 
+                        item.classList.contains('highlighted')) {
+                        item.classList.remove('highlighted');
+                    }
+                }
+            });
+            
+            // 更新时间线填充进度 - 避免不必要的DOM操作
+            if (timelineItems.length > 0) {
+                const fillPercentage = Math.floor((visibleCount / timelineItems.length) * 100);
+                // 只在百分比变化时更新
+                const currentHeight = timelineLine.style.height;
+                const newHeight = `${fillPercentage}%`;
+                
+                if (currentHeight !== newHeight) {
+                    timelineLine.style.height = newHeight;
+                }
+                
+                // 确保添加filled类
+                if (!timelineLine.classList.contains('filled')) {
+                    timelineLine.classList.add('filled');
+                }
+            }
+        }
+
+        // 托孤书弹窗交互功能 - 优化版
+        // 使用对象缓存DOM元素
+        const letterModalElements = {
+            openBtn: document.getElementById('open-letter-modal'),
+            closeBtn1: document.getElementById('close-letter-modal'),
+            closeBtn2: document.getElementById('close-letter-modal-btn'),
+            modal: document.getElementById('letter-modal'),
+            videoElement: null // 将在需要时缓存
+        };
+        
+        // 关闭弹窗函数 - 优化版
+        function closeLetterModal() {
+            if (!letterModalElements.modal) return;
+            
+            // 移除active类
+            letterModalElements.modal.classList.remove('active');
+            
+            // 恢复背景滚动
+            document.body.style.overflow = 'auto';
+            
+            // 性能优化：只在第一次访问时查询视频元素并缓存
+            if (!letterModalElements.videoElement) {
+                letterModalElements.videoElement = letterModalElements.modal.querySelector('video');
+            }
+            
+            // 暂停并重置视频
+            if (letterModalElements.videoElement) {
+                letterModalElements.videoElement.pause();
+                letterModalElements.videoElement.currentTime = 0;
+            }
+        }
+        
+        // 打开弹窗函数 - 优化版
+        function openLetterModal() {
+            if (!letterModalElements.modal) return;
+            
+            letterModalElements.modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // 初始化托孤书弹窗功能
+        function initLetterModal() {
+            // 元素存在性检查
+            if (!letterModalElements.modal || !letterModalElements.openBtn) return;
+            
+            // 绑定打开事件
+            letterModalElements.openBtn.addEventListener('click', openLetterModal);
+            
+            // 绑定关闭事件（使用函数引用而不是匿名函数）
+            if (letterModalElements.closeBtn1) {
+                letterModalElements.closeBtn1.addEventListener('click', closeLetterModal);
+            }
+            
+            if (letterModalElements.closeBtn2) {
+                letterModalElements.closeBtn2.addEventListener('click', closeLetterModal);
+            }
+            
+            // 点击模态框外部关闭
+            letterModalElements.modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeLetterModal();
+                }
+            });
+            
+            // ESC键关闭功能（使用更简洁的条件判断）
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && 
+                    letterModalElements.modal && 
+                    letterModalElements.modal.classList.contains('active')) {
+                    closeLetterModal();
+                }
+            });
+        }
+        
+        // 移除单独的初始化调用，统一由DOMContentLoaded事件处理
+
+        // 视频加载优化功能
+        function optimizeVideoLoading() {
+            // 检测设备类型，为PC和移动设备设置不同策略
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isLowEndDevice = isMobile || navigator.deviceMemory <= 4 || navigator.hardwareConcurrency <= 4;
+            
+            // 为所有视频添加延迟加载逻辑
+            const lazyVideos = document.querySelectorAll('video');
+            
+            // 根据设备类型设置不同的加载参数
+            const loadConfig = {
+                rootMargin: isLowEndDevice ? '200px 0px' : '1000px 0px', // PC端大幅扩大预加载区域
+                timeoutMs: isLowEndDevice ? 10000 : 30000 // 延长PC端超时
+            };
+            
+            // PC端优化：允许同时加载所有视频，但推出视图后停止加载
+            if (!isLowEndDevice && 'IntersectionObserver' in window) {
+                // 视频可见性管理器
+                const visibilityManager = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        const video = entry.target;
+                        
+                        if (entry.isIntersecting) {
+                            // 视频进入视图时，开始加载
+                            try {
+                                if (video.readyState === 0 || video.readyState === 1) {
+                                    video.preload = 'auto'; // PC端使用auto预加载
+                                    video.load();
+                                }
+                            } catch (e) {
+                                console.warn('视频加载失败:', e);
+                            }
+                        } else {
+                            // 视频离开视图时，停止加载并释放资源
+                            try {
+                                // 只有非播放状态的视频才暂停加载
+                                if (video.paused || video.ended) {
+                                    // 保存当前URL
+                                    const videoSrc = video.src;
+                                    // 清空src停止加载
+                                    video.src = '';
+                                    // 恢复src但不自动加载
+                                    video.src = videoSrc;
+                                    video.preload = 'none';
+                                }
+                            } catch (e) {
+                                console.warn('视频资源释放失败:', e);
+                            }
+                        }
+                    });
+                }, {
+                    rootMargin: loadConfig.rootMargin,
+                    threshold: 0.1
+                });
+                
+                // 观察所有视频
+                lazyVideos.forEach(video => {
+                    visibilityManager.observe(video);
+                });
+                
+                // 额外优化：为所有视频设置预加载
+                lazyVideos.forEach(video => {
+                    try {
+                        video.preload = 'metadata';
+                    } catch (e) {
+                        console.warn('设置预加载失败:', e);
+                    }
+                });
+            }
+            
+            // 移动端和低端设备仍使用严格的队列控制
+            if (isLowEndDevice && 'IntersectionObserver' in window) {
+                // 优化Intersection Observer性能
+                let isProcessing = false;
+                const processQueue = [];
+                
+                function processIntersectionQueue() {
+                    if (isProcessing || processQueue.length === 0) return;
+                    isProcessing = true;
+                    
+                    const batch = processQueue.splice(0, 1); // 移动端一次只处理1个
+                    
+                    batch.forEach(video => {
+                        if (video.readyState === 0 || video.readyState === 1) {
+                            try {
+                                video.load();
+                            } catch (e) {
+                                console.warn('视频加载失败:', e);
+                            }
+                        }
+                    });
+                    
+                    setTimeout(() => {
+                        isProcessing = false;
+                        if (processQueue.length > 0) {
+                            processIntersectionQueue();
+                        }
+                    }, 100);
+                }
+                
+                const videoObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        const video = entry.target;
+                        
+                        if (entry.isIntersecting) {
+                            processQueue.push(video);
+                            if (!isProcessing) {
+                                processIntersectionQueue();
+                            }
+                        } else {
+                            // 移动端离开视图也释放资源
+                            try {
+                                if (video.paused || video.ended) {
+                                    const videoSrc = video.src;
+                                    video.src = '';
+                                    video.src = videoSrc;
+                                    video.preload = 'none';
+                                }
+                            } catch (e) {
+                                console.warn('视频资源释放失败:', e);
+                            }
+                        }
+                    });
+                }, {
+                    rootMargin: loadConfig.rootMargin,
+                    threshold: 0.1
+                });
+                
+                lazyVideos.forEach(video => {
+                    videoObserver.observe(video);
+                });
+            }
+            
+            // 统一的视频错误处理
+            lazyVideos.forEach(video => {
+                video.addEventListener('error', function() {
+                    try {
+                        const videoContainer = this.parentElement;
+                        if (!videoContainer) return;
+                        
+                        const loadingSelectors = ['.loading', '#nanchang-video-loading', '#longyuankou-video-loading', '#xiangnan-video-loading', '#letter-section-loading', '#modal-video-loading'];
+                        let loadingElement = null;
+                        
+                        for (const selector of loadingSelectors) {
+                            loadingElement = videoContainer.querySelector(selector);
+                            if (loadingElement) break;
+                        }
+                        
+                        if (loadingElement && !loadingElement.querySelector('.retry-button')) {
+                            loadingElement.innerHTML = '<p class="text-red-500">视频加载失败，请检查网络连接或稍后重试</p><button class="retry-button bg-blue-500 text-white px-4 py-2 rounded mt-2">重试加载</button>';
+                            
+                            const retryButton = loadingElement.querySelector('.retry-button');
+                            if (retryButton) {
+                                retryButton.addEventListener('click', () => {
+                                    loadingElement.innerHTML = '<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div><p class="text-sm">视频加载中...</p>';
+                                    this.load();
+                                });
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('错误处理失败:', e);
+                    }
+                });
+            });
+        }
+        
+        // 统一初始化逻辑，确保所有功能在DOM准备好后初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            // 初始化视频加载优化
+            if (typeof optimizeVideoLoading === 'function') {
+                // 立即执行视频优化，优先处理视频加载
+                optimizeVideoLoading();
+            }
+            
+            // 初始化各个功能模块
+            if (typeof initVirtualTour === 'function') {
+                initVirtualTour();
+            }
+            if (typeof initMessageFunctionality === 'function') {
+                initMessageFunctionality();
+            }
+            if (typeof initLetterModal === 'function') {
+                initLetterModal();
+            }
+            if (typeof initBattleChart === 'function') {
+                // 延迟初始化图表，避免阻塞页面渲染
+                setTimeout(initBattleChart, 500);
+            }
+            if (typeof enhanceVirtualTour === 'function') {
+                // 设置虚拟参观图片预加载
+                enhanceVirtualTour();
+            }
+            
+            // 初始化页面时触发一次时间线动画
+            setTimeout(animateTimeline, 100); // 小延迟确保DOM完全渲染
+        });
+        
+        // 窗口加载完成后再触发一次时间线动画，确保所有内容都已加载
+        window.addEventListener('load', function() {
+            setTimeout(animateTimeline, 300); // 给予更多时间确保图片等资源加载完成
+        });
+        
+        // 窗口大小变化时重新计算时间线
+        window.addEventListener('resize', debounce(animateTimeline, 200));
+        
+        // 添加全局错误处理，提高页面稳定性
+        window.addEventListener('error', function(e) {
+            // 记录错误信息但不中断页面运行
+            console.error('页面错误:', e.message, '发生在:', e.filename, '行号:', e.lineno);
+            // 静默处理，不显示错误给用户，确保页面继续运行
+        });
+        
+        // 添加Promise错误捕获
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Promise错误:', e.reason);
+        });
+    </script>
+</body>
+</html>
